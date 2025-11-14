@@ -1,0 +1,443 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SkillSync{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d4ed8;
+            text-decoration: none;
+            min-width: fit-content;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .navbar .nav-links a.btn {
+            background: #1d4ed8;
+            color: #fff;
+            padding: 8px 14px;
+        }
+
+        .navbar .nav-links a.btn:hover {
+            background: #1e40af;
+        }
+
+        .navbar .nav-links a.btn.logout {
+            background: #ef4444;
+        }
+
+        .navbar .nav-links a.btn.logout:hover {
+            background: #dc2626;
+        }
+
+        .navbar .nav-links .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #333;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .nav-links .profile-link:hover {
+            background: #f0f4f8;
+        }
+
+        .navbar .nav-links .profile-link img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #1d4ed8;
+        }
+
+        .navbar .nav-links .profile-link span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #1d4ed8;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(10px, 10px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 60px;
+            right: 0;
+            background: #fff;
+            width: 100%;
+            max-width: 300px;
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 99;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .mobile-menu a {
+            padding: 16px 20px;
+            text-decoration: none;
+            color: #333;
+            border-bottom: 1px solid #f0f4f8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mobile-menu a:hover {
+            background: #f0f4f8;
+            color: #1d4ed8;
+        }
+
+        .mobile-menu a.profile-link {
+            border-bottom: 2px solid #1d4ed8;
+        }
+
+        .mobile-menu a img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #1d4ed8;
+        }
+
+        .mobile-menu a.btn {
+            background: #1d4ed8;
+            color: #fff;
+            margin: 10px 12px;
+            border-radius: 8px;
+            justify-content: center;
+        }
+
+        .mobile-menu a.btn:hover {
+            background: #1e40af;
+            border-bottom: none;
+        }
+
+        .mobile-menu a.btn.logout {
+            background: #ef4444;
+        }
+
+        .mobile-menu a.btn.logout:hover {
+            background: #dc2626;
+        }
+
+        .main-container {
+            min-height: calc(100vh - 60px);
+            padding: 0;
+        }
+
+        /* Desktop */
+        @media (min-width: 769px) {
+            .hamburger {
+                display: none !important;
+            }
+
+            .mobile-menu {
+                display: none !important;
+            }
+        }
+
+        /* Tablet (iPad) */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px 16px;
+            }
+
+            .navbar .logo {
+                font-size: 20px;
+            }
+
+            .navbar .nav-links {
+                gap: 8px;
+            }
+
+            .navbar .nav-links a {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+
+            .navbar .nav-links a.btn {
+                padding: 7px 12px;
+            }
+
+            .navbar .nav-links .profile-link span {
+                display: none;
+            }
+
+            .navbar .nav-links .profile-link img {
+                width: 28px;
+                height: 28px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .mobile-menu {
+                max-width: 280px;
+            }
+        }
+
+        /* Mobile (Phone) */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .navbar .logo {
+                font-size: 18px;
+            }
+
+            .navbar .nav-links {
+                gap: 4px;
+            }
+
+            .navbar .nav-links a {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+
+            .navbar .nav-links a.btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .navbar .nav-links .profile-link {
+                padding: 4px 6px;
+            }
+
+            .navbar .nav-links .profile-link span {
+                display: none;
+            }
+
+            .navbar .nav-links .profile-link img {
+                width: 26px;
+                height: 26px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hamburger span {
+                width: 22px;
+                height: 2.5px;
+            }
+
+            .mobile-menu {
+                max-width: 260px;
+            }
+
+            .mobile-menu a {
+                padding: 14px 16px;
+                font-size: 14px;
+            }
+
+            .mobile-menu a img {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* Extra Small Screens */
+        @media (max-width: 360px) {
+            .navbar {
+                padding: 6px 8px;
+            }
+
+            .navbar .logo {
+                font-size: 16px;
+            }
+
+            .hamburger span {
+                width: 20px;
+                height: 2px;
+            }
+
+            .mobile-menu {
+                max-width: 240px;
+            }
+
+            .mobile-menu a {
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+
+            .mobile-menu a img {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'home' %}" class="logo">SkillSync</a>
+        
+        <!-- Desktop Navigation -->
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'view_profile' user.username %}" class="profile-link" title="{{ user.username }}">
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile">
+                    <span>{{ user.username }}</span>
+                </a>
+                <a href="{% url 'add_content' %}" class="btn" title="Create Post">Create Post</a>
+                <a href="{% url 'logout' %}" class="btn logout" title="Logout">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn">Login</a>
+                <a href="{% url 'register' %}" class="btn">Register</a>
+            {% endif %}
+            <a href="{% url 'about' %}" class="btn">About</a>
+        </div>
+
+        <!-- Hamburger Menu Icon -->
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        {% if user.is_authenticated %}
+            <a href="{% url 'view_profile' user.username %}" class="profile-link">
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile">
+                <span>{{ user.username }}</span>
+            </a>
+            <a href="{% url 'add_content' %}" class="btn">📝 Create Post</a>
+            <a href="{% url 'about' %}" class="btn">ℹ️ About</a>
+            <a href="{% url 'logout' %}" class="btn logout">🚪 Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn">🔑 Login</a>
+            <a href="{% url 'register' %}" class="btn">📝 Register</a>
+            <a href="{% url 'about' %}" class="btn">ℹ️ About</a>
+        {% endif %}
+    </div>
+
+    <div class="main-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Hamburger menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        const menuLinks = mobileMenu.querySelectorAll('a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.navbar') && !e.target.closest('.mobile-menu')) {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

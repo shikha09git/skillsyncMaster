@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ content.title }}</h1>
+<p>{{ content.description }}</p>
+<p>Instructor: {{ content.instructor }}</p>
+<p>Duration: {{ content.duration }}</p>
+<p>Likes: {{ content.total_likes }}</p>
+
+{% if content.image %}
+    <img src="{{ content.image.url }}" alt="{{ content.title }}" width="400">
+{% endif %}
+
+{% if content.video %}
+    <video width="640" height="360" controls>
+        <source src="{{ content.video.url }}" type="video/mp4">
+    </video>
+{% endif %}
+
+<h3>Comments</h3>
+<ul>
+    {% for comment in content.comments.all %}
+        <li>{{ comment.user.username }}: {{ comment.body }}</li>
+    {% empty %}
+        <li>No comments yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

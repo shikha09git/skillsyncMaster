@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile.user.username }} - Profile{% endblock %}
+
+{% block content %}
+<div class="profile-container" style="max-width: 800px; margin: 50px auto; display: flex; flex-direction: column; align-items: center; gap: 30px;">
+
+    <!-- Profile Card -->
+    <div class="profile-card" style="width: 100%; background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+
+        <!-- Profile Picture -->
+        {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture"
+                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff;">
+        {% else %}
+            <img src="{% static 'images/default-profile.png' %}" alt="Default Profile Picture"
+                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff;">
+        {% endif %}
+
+        <!-- Name and Profession -->
+        <h2 style="margin: 0;">{{ profile.full_name|default:profile.user.username }}</h2>
+        {% if profile.profession %}
+            <p style="color: #555; font-size: 16px; margin: 5px 0;">{{ profile.profession }}</p>
+        {% endif %}
+
+        <!-- About -->
+        {% if profile.about %}
+            <p style="text-align: center; color: #666; font-size: 14px; line-height: 1.5; max-width: 600px;">
+                {{ profile.about }}
+            </p>
+        {% endif %}
+
+        <!-- Edit Profile Button (only for own profile) -->
+        {% if request.user == profile.user %}
+            <a href="{% url 'edit_profile' %}" 
+               style="padding: 10px 20px; border-radius: 8px; background: #007bff; color: #fff; text-decoration: none; font-weight: 500; transition: 0.3s;">
+                Edit Profile
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- User Posts -->
+    <div class="user-posts" style="width: 100%; display: flex; flex-direction: column; gap: 20px;">
+        <h3 style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Posts by {{ profile.full_name|default:profile.user.username }}</h3>
+        
+        {% for content in user_posts %}
+            <div class="post-card" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                <h4>{{ content.title }}</h4>
+                <p>{{ content.description }}</p>
+
+                {% if content.image %}
+                    <img src="{{ content.image.url }}" alt="Post Image" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 10px;">
+                {% endif %}
+
+                {% if content.video %}
+                    <video width="100%" controls style="margin-top: 10px;">
+                        <source src="{{ content.video.url }}" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                {% endif %}
+
+                <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                    <!-- Like Button -->
+                    <form method="POST" action="{% url 'like_content' content.id %}">
+                        {% csrf_token %}
+                        {% if user in content.likes.all %}
+                            <button type="submit" style="border:none; background: none; cursor:pointer; color: #dc3545;">❤️ {{ content.likes.count }}</button>
+                        {% else %}
+                            <button type="submit" style="border:none; background: none; cursor:pointer; color: #007bff;">👍 {{ content.likes.count }}</button>
+                        {% endif %}
+                    </form>
+
+                    <!-- Comment Count -->
+                    <span style="color: #555;">💬 {{ content.comment_set.count }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <p style="text-align: center; color: #777;">No posts yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
