@@ -504,13 +504,20 @@
                     </button>
 
                     {% if content.created_by == user %}
-                        <form method="POST" action="{% url 'delete_content' content.id }}" style="display:inline;" onclick="event.stopPropagation();">
+                        <form method="POST"
+                            action="{% url 'delete_content' content.id %}"
+                            style="display:inline;"
+                            onclick="event.stopPropagation();">
                             {% csrf_token %}
-                            <button type="submit" class="post-action" style="color: #ef4444;" onclick="return confirm('Delete this post?');">
-                                🗑️ Delete
+                            <button type="submit"
+                                    class="like-btn post-action"
+                                    style="color:#ef4444;"
+                                    onclick="return confirm('Delete this post?');">
+                                🗑️
                             </button>
                         </form>
-                    {% endif %}
+                        {% endif %}
+
 
                     <button class="see-more-btn" onclick="event.stopPropagation(); openModal('post-{{ content.id }}');">
                         See Full Post →
@@ -597,9 +604,18 @@
 
                             <div class="comments-list" id="comments-list-{{ content.id }}">
                                 {% for comment in content.comment_set.all %}
-                                    <div class="comment-item">
-                                        <div class="comment-username">{{ comment.user.username }}</div>
-                                        <div class="comment-body">{{ comment.body }}</div>
+                                    <div class="comment-item" id="comment-{{ comment.id }}">
+                                        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                                            <div>
+                                                <div class="comment-username">{{ comment.user.username }}</div>
+                                                <div class="comment-body">{{ comment.body }}</div>
+                                            </div>
+                                            {% if comment.user == user %}
+                                                <div style="margin-left:12px;">
+                                                    <button type="button" class="post-action delete-comment-btn" data-comment-id="{{ comment.id }}" data-post-id="{{ content.id }}" style="color:#ef4444;">Delete</button>
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 {% empty %}
                                     <p style="color: #9ca3af; font-size: 14px; text-align: center; padding: 20px;">No comments yet. Be the first to comment!</p>
@@ -677,7 +693,9 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
+        console.log('home.html script loaded: DOMContentLoaded');
         const csrftoken = getCookie('csrftoken');
+        const currentUsername = "{{ user.username|escapejs }}";
 
         // Check for broken images on load
         document.querySelectorAll('.user-avatar').forEach(img => {
@@ -708,7 +726,7 @@
             });
         });
 
-        /* SUBMIT COMMENT */
+    /* SUBMIT COMMENT */
         document.querySelectorAll(".comment-form").forEach(form => {
             form.addEventListener("submit", (e) => {
                 e.preventDefault();
@@ -732,17 +750,113 @@
                         const commentsList = document.getElementById(`comments-list-${postId}`);
                         const newComment = document.createElement("div");
                         newComment.className = "comment-item";
+                        newComment.id = `comment-${data.id}`;
+
+                        // Build inner HTML and include delete button if current user is the owner
+                        let deleteBtn = '';
+                        if (data.username === currentUsername) {
+                            deleteBtn = ` <button type="button" class="post-action delete-comment-btn" data-comment-id="${data.id}" data-post-id="${postId}" style="color:#ef4444;">Delete</button>`;
+                        }
+
                         newComment.innerHTML = `
-                            <div class="comment-username">${data.username}</div>
-                            <div class="comment-body">${data.body}</div>
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                                <div>
+                                    <div class="comment-username">${data.username}</div>
+                                    <div class="comment-body">${data.body}</div>
+                                </div>
+                                ${deleteBtn}
+                            </div>
                         `;
+
                         commentsList.appendChild(newComment);
 
                         const countSpan = document.getElementById(`comment-count-${postId}`);
-                        countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                        if (countSpan) countSpan.textContent = parseInt(countSpan.textContent) + 1;
 
                         input.value = "";
                     }
+                }).catch(err => {
+                    console.error('Add comment error', err);
+                });
+            });
+        });
+
+        // Delegated handler for deleting comments
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+            if (target && target.classList && target.classList.contains('delete-comment-btn')) {
+                e.stopPropagation();
+                const commentId = target.dataset.commentId;
+                const postId = target.dataset.postId;
+                if (!commentId) return;
+
+                if (!confirm('Delete this comment?')) return;
+
+                console.log('Attempting to delete comment', commentId, 'post', postId);
+                fetch(`/comment/delete/${commentId}/`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => {
+                    console.log('Delete response status', res.status, res.statusText);
+                    // Try to parse JSON if possible
+                    return res.json().catch(() => ({ success: res.ok }));
+                })
+                .then(data => {
+                    console.log('Delete response data', data);
+                    if (data && data.success) {
+                        // Remove comment element from DOM
+                        const el = document.getElementById(`comment-${commentId}`);
+                        if (el) el.remove();
+                        // decrement comment count
+                        const countSpan = document.getElementById(`comment-count-${postId}`);
+                        if (countSpan) countSpan.textContent = Math.max(0, parseInt(countSpan.textContent) - 1);
+                    } else {
+                        console.error('Delete failed', data);
+                        alert(data && data.error ? data.error : 'Could not delete comment.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Delete comment failed', err);
+                    alert('Could not delete comment. See console for details.');
+                });
+            }
+        });
+
+        // Also attach direct listeners to any existing delete buttons (some browsers/contexts
+        // may not dispatch delegated events the same way). This ensures clicks are handled.
+        document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // Prevent double handling in case delegation also fires
+                e.stopPropagation();
+                e.preventDefault();
+                const target = e.currentTarget;
+                const commentId = target.dataset.commentId;
+                const postId = target.dataset.postId;
+                if (!commentId) return;
+                if (!confirm('Delete this comment?')) return;
+
+                console.log('Direct delete click handler', commentId, postId);
+                fetch(`/comment/delete/${commentId}/`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.json().catch(() => ({ success: res.ok })))
+                .then(data => {
+                    console.log('Direct delete response', data);
+                    if (data && data.success) {
+                        const el = document.getElementById(`comment-${commentId}`);
+                        if (el) el.remove();
+                        const countSpan = document.getElementById(`comment-count-${postId}`);
+                        if (countSpan) countSpan.textContent = Math.max(0, parseInt(countSpan.textContent) - 1);
+                    } else {
+                        alert(data && data.error ? data.error : 'Could not delete comment.');
+                    }
+                }).catch(err => {
+                    console.error('Direct delete failed', err);
+                    alert('Could not delete comment. See console for details.');
                 });
             });
         });

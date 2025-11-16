@@ -18,11 +18,26 @@
 {% endif %}
 
 <h3>Comments</h3>
-<ul>
+
+<ul style="list-style:none; padding:0;">
     {% for comment in content.comments.all %}
-        <li>{{ comment.user.username }}: {{ comment.body }}</li>
+        <li style="background:#f4f4f4; margin-bottom:8px; padding:10px; border-radius:8px;">
+            <strong>{{ comment.user.username }}</strong>: {{ comment.body }}
+
+            {% if comment.user == user %}
+                <form action="{% url 'delete_comment' comment.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" 
+                        style="color:red; background:none; border:none; cursor:pointer; margin-left:10px;">
+                        Delete
+                    </button>
+                </form>
+            {% endif %}
+        </li>
     {% empty %}
         <li>No comments yet.</li>
     {% endfor %}
 </ul>
+
 {% endblock %}
+

@@ -264,6 +264,23 @@
 
                     <!-- Comment Count -->
                     <span style="color: #6b7280; font-weight: 600;">💬 {{ content.comment_set.count }}</span>
+
+                    {% if content.created_by == user %}
+                        <form method="POST"
+                            action="{% url 'delete_content' content.id %}"
+                            style="display:inline;"
+                            onclick="event.stopPropagation();">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="like-btn post-action"
+                                    style="color:#ef4444;"
+                                    onclick="return confirm('Delete this post?');">
+                                🗑️
+                            </button>
+                        </form>
+                        {% endif %}
+
+
                 </div>
             </div>
         {% empty %}

@@ -136,6 +136,7 @@ def add_comment(request, post_id):
         # Return JSON for AJAX
         return JsonResponse({
             'success': True,
+            'id': comment.id,
             'username': comment.user.username,
             'body': comment.body,
             'created_at': comment.created_at.strftime("%Y-%m-%d %H:%M:%S")
@@ -158,18 +159,48 @@ def about(request):
     return render(request, 'about.html')
 
 
+# @login_required
+# def delete_comment(request, comment_id):
+#     comment = get_object_or_404(Comment, id=comment_id)
+
+#     if request.user != comment.user:
+#         return JsonResponse({"success": False})
+
+#     post = comment.post
+#     comment.delete()
+
+#     return JsonResponse({
+#         "success": True,
+#         "post_id": post.id,
+#         "total_comments": post.comments.count()
+#     })
+
+
+def content_detail(request, content_id):
+    content = get_object_or_404(Content, id=content_id)
+    comments = Comment.objects.filter(content=content).order_by('-created_at')
+    return render(request, 'content_detail.html', {'content': content, 'comments': comments})
+
+
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    if request.user != comment.user:
-        return JsonResponse({"success": False})
+    # Only allow POST for AJAX deletion
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
-    post = comment.post
-    comment.delete()
+    if request.method != 'POST' and is_ajax:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
-    return JsonResponse({
-        "success": True,
-        "post_id": post.id,
-        "total_comments": post.comments.count()
-    })
+    if request.user == comment.user:   # Only comment owner can delete
+        comment.delete()
+        if is_ajax:
+            return JsonResponse({'success': True, 'comment_id': comment_id})
+        messages.success(request, "Comment deleted successfully!")
+    else:
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'You are not allowed to delete this comment.'}, status=403)
+        messages.error(request, "You are not allowed to delete this comment.")
+
+    # For non-AJAX requests, redirect back
+    return redirect(request.META.get("HTTP_REFERER", "home"))
