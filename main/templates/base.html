@@ -15,7 +15,120 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f7fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef2f8 50%, #f0f4f9 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Aesthetic Background Graphics */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(29, 78, 216, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px);
+            }
+            25% {
+                transform: translateY(-30px) translateX(20px);
+            }
+            50% {
+                transform: translateY(-60px) translateX(-10px);
+            }
+            75% {
+                transform: translateY(-30px) translateX(-20px);
+            }
+        }
+
+        /* Geometric shapes background */
+        body .background-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.03;
+            mix-blend-mode: multiply;
+        }
+
+        .shape-1 {
+            top: 10%;
+            left: 5%;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #1d4ed8 0%, transparent 100%);
+            border-radius: 50%;
+            animation: rotate 30s linear infinite;
+        }
+
+        .shape-2 {
+            top: 50%;
+            right: 10%;
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(45deg, #2563eb 0%, transparent 100%);
+            border-radius: 20%;
+            animation: rotate 40s linear infinite reverse;
+        }
+
+        .shape-3 {
+            bottom: 10%;
+            left: 20%;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(90deg, #3b82f6 0%, transparent 100%);
+            border-radius: 40%;
+            animation: rotate 50s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Grid pattern */
+        body::backdrop {
+            background-image: 
+                linear-gradient(rgba(29, 78, 216, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(29, 78, 216, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 0 0;
         }
 
         /* Navbar Styles */
@@ -23,20 +136,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 14px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .navbar .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1d4ed8;
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             text-decoration: none;
             min-width: fit-content;
+            letter-spacing: -0.5px;
         }
 
         .navbar .nav-links {
@@ -47,46 +165,76 @@
 
         .navbar .nav-links a {
             text-decoration: none;
-            color: #333;
-            padding: 8px 12px;
-            border-radius: 8px;
+            color: #475569;
+            padding: 8px 16px;
+            border-radius: 6px;
             transition: all 0.3s ease;
             font-weight: 500;
             font-size: 14px;
             white-space: nowrap;
         }
 
+        .navbar .nav-links a:hover {
+            color: #1d4ed8;
+        }
+
         .navbar .nav-links a.btn {
             background: #1d4ed8;
             color: #fff;
-            padding: 8px 14px;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .navbar .nav-links a.btn.btn-secondary {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .navbar .nav-links a.btn.btn-secondary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
         .navbar .nav-links a.btn:hover {
             background: #1e40af;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
         }
 
         .navbar .nav-links a.btn.logout {
-            background: #ef4444;
+            background: #dc2626;
         }
 
         .navbar .nav-links a.btn.logout:hover {
-            background: #dc2626;
+            background: #b91c1c;
         }
 
         .navbar .nav-links .profile-link {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             text-decoration: none;
             color: #333;
-            padding: 6px 10px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
             transition: all 0.3s ease;
         }
 
         .navbar .nav-links .profile-link:hover {
-            background: #f0f4f8;
+            background: #f1f5f9;
+        }
+
+        /* Avatar Wrapper for Navbar */
+        .navbar-avatar-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
         }
 
         .navbar .nav-links .profile-link img {
@@ -94,13 +242,35 @@
             height: 32px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #1d4ed8;
+            border: 2px solid #e2e8f0;
+        }
+
+        .navbar-avatar-fallback {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .navbar-profile-img.broken ~ .navbar-avatar-fallback {
+            display: flex;
         }
 
         .navbar .nav-links .profile-link span {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
-            color: #333;
+            color: #1f2937;
         }
 
         /* Hamburger Menu */
@@ -109,18 +279,19 @@
             flex-direction: column;
             cursor: pointer;
             gap: 5px;
+            z-index: 101;
         }
 
         .hamburger span {
-            width: 25px;
-            height: 3px;
+            width: 24px;
+            height: 2.5px;
             background: #1d4ed8;
             border-radius: 2px;
             transition: all 0.3s ease;
         }
 
         .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(10px, 10px);
+            transform: rotate(45deg) translate(8px, 8px);
         }
 
         .hamburger.active span:nth-child(2) {
@@ -131,25 +302,51 @@
             transform: rotate(-45deg) translate(7px, -7px);
         }
 
+        /* Mobile Menu Backdrop */
+        .menu-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 98;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .menu-backdrop.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
         /* Mobile Menu */
         .mobile-menu {
             display: none;
             position: fixed;
             top: 60px;
             right: 0;
-            background: #fff;
+            background: #ffffff;
             width: 100%;
-            max-width: 300px;
+            max-width: 320px;
             max-height: calc(100vh - 60px);
             overflow-y: auto;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: -4px 12px 32px rgba(0, 0, 0, 0.15);
             z-index: 99;
-            animation: slideInRight 0.3s ease-out;
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-direction: column;
         }
 
         .mobile-menu.active {
             display: flex;
-            flex-direction: column;
         }
 
         @keyframes slideInRight {
@@ -163,59 +360,182 @@
             }
         }
 
-        .mobile-menu a {
-            padding: 16px 20px;
-            text-decoration: none;
-            color: #333;
-            border-bottom: 1px solid #f0f4f8;
+        .mobile-menu-header {
+            padding: 20px 20px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        .mobile-menu-header .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mobile-menu-content {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+        }
+
+        .mobile-menu a {
+            padding: 14px 20px;
+            text-decoration: none;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
             font-weight: 500;
+            font-size: 15px;
+            border-left: 3px solid transparent;
         }
 
         .mobile-menu a:hover {
-            background: #f0f4f8;
+            background: #f1f5f9;
             color: #1d4ed8;
+            border-left-color: #1d4ed8;
         }
 
-        .mobile-menu a.profile-link {
-            border-bottom: 2px solid #1d4ed8;
+        .mobile-menu a.profile-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .mobile-menu a.profile-section:hover {
+            background: #f1f5f9;
+        }
+
+        .mobile-menu .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Mobile Menu Avatar Wrapper */
+        .mobile-menu-avatar-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
         }
 
         .mobile-menu a img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
             object-fit: cover;
-            border: 2px solid #1d4ed8;
+            border: 2px solid #e2e8f0;
+        }
+
+        .mobile-menu-avatar-fallback {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .mobile-menu-profile-img.broken ~ .mobile-menu-avatar-fallback {
+            display: flex;
+        }
+
+        .mobile-menu .profile-name {
+            font-weight: 700;
+            color: #1f2937;
+            font-size: 15px;
+        }
+
+        .mobile-menu .profile-email {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .mobile-menu .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 8px 0;
         }
 
         .mobile-menu a.btn {
-            background: #1d4ed8;
-            color: #fff;
-            margin: 10px 12px;
-            border-radius: 8px;
-            justify-content: center;
+            background: none;
+            color: inherit;
+            margin: 0;
+            padding: 14px 20px;
+            border-radius: 0;
+            border-left: 3px solid transparent;
+            font-weight: 500;
         }
 
         .mobile-menu a.btn:hover {
+            background: #f1f5f9;
+            color: #1d4ed8;
+            border-left-color: #1d4ed8;
+        }
+
+        .mobile-menu .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 12px;
+            margin-top: 8px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .mobile-menu .action-btn {
+            padding: 11px 16px;
+            text-decoration: none;
+            color: #fff;
+            background: #1d4ed8;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: block;
+        }
+
+        .mobile-menu .action-btn:hover {
             background: #1e40af;
-            border-bottom: none;
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+            transform: translateY(-1px);
         }
 
-        .mobile-menu a.btn.logout {
-            background: #ef4444;
-        }
-
-        .mobile-menu a.btn.logout:hover {
+        .mobile-menu .action-btn.logout {
             background: #dc2626;
+            color: #fff;
+        }
+
+        .mobile-menu .action-btn.logout:hover {
+            background: #b91c1c;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
         }
 
         .main-container {
             min-height: calc(100vh - 60px);
             padding: 0;
+            position: relative;
+            z-index: 1;
         }
 
         /* Desktop */
@@ -227,38 +547,28 @@
             .mobile-menu {
                 display: none !important;
             }
+
+            .menu-backdrop {
+                display: none !important;
+            }
+
+            .navbar .nav-links {
+                display: flex;
+            }
         }
 
         /* Tablet (iPad) */
         @media (max-width: 768px) {
             .navbar {
-                padding: 10px 16px;
+                padding: 12px 16px;
             }
 
             .navbar .logo {
-                font-size: 20px;
+                font-size: 22px;
             }
 
             .navbar .nav-links {
-                gap: 8px;
-            }
-
-            .navbar .nav-links a {
-                padding: 7px 10px;
-                font-size: 13px;
-            }
-
-            .navbar .nav-links a.btn {
-                padding: 7px 12px;
-            }
-
-            .navbar .nav-links .profile-link span {
                 display: none;
-            }
-
-            .navbar .nav-links .profile-link img {
-                width: 28px;
-                height: 28px;
             }
 
             .hamburger {
@@ -266,46 +576,18 @@
             }
 
             .mobile-menu {
-                max-width: 280px;
+                max-width: 300px;
             }
         }
 
         /* Mobile (Phone) */
         @media (max-width: 480px) {
             .navbar {
-                padding: 8px 12px;
-                gap: 8px;
+                padding: 12px 16px;
             }
 
             .navbar .logo {
-                font-size: 18px;
-            }
-
-            .navbar .nav-links {
-                gap: 4px;
-            }
-
-            .navbar .nav-links a {
-                padding: 6px 8px;
-                font-size: 12px;
-            }
-
-            .navbar .nav-links a.btn {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
-
-            .navbar .nav-links .profile-link {
-                padding: 4px 6px;
-            }
-
-            .navbar .nav-links .profile-link span {
-                display: none;
-            }
-
-            .navbar .nav-links .profile-link img {
-                width: 26px;
-                height: 26px;
+                font-size: 20px;
             }
 
             .hamburger {
@@ -318,70 +600,207 @@
             }
 
             .mobile-menu {
-                max-width: 260px;
+                max-width: 100%;
+            }
+
+            .mobile-menu-header {
+                padding: 16px;
             }
 
             .mobile-menu a {
-                padding: 14px 16px;
+                padding: 12px 16px;
                 font-size: 14px;
             }
 
+            .mobile-menu a.profile-section {
+                padding: 14px 16px;
+            }
+
             .mobile-menu a img {
-                width: 36px;
-                height: 36px;
+                width: 40px;
+                height: 40px;
             }
         }
 
         /* Extra Small Screens */
         @media (max-width: 360px) {
             .navbar {
-                padding: 6px 8px;
+                padding: 10px 12px;
             }
 
             .navbar .logo {
-                font-size: 16px;
+                font-size: 18px;
             }
 
             .hamburger span {
                 width: 20px;
-                height: 2px;
             }
 
             .mobile-menu {
-                max-width: 240px;
+                max-width: 100%;
             }
+        }
 
-            .mobile-menu a {
-                padding: 12px 14px;
-                font-size: 13px;
-            }
+        /* Scrollbar styling for mobile menu */
+        .mobile-menu::-webkit-scrollbar {
+            width: 6px;
+        }
 
-            .mobile-menu a img {
-                width: 32px;
-                height: 32px;
+        .mobile-menu::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .mobile-menu::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .mobile-menu::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ===== PAGE LOADER ===== */
+        .page-loader {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef2f8 100%);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeOut 0.5s ease-in-out 1.5s forwards;
+        }
+
+        .page-loader.hidden {
+            display: none;
+        }
+
+        .loader-wrapper {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 100px;
+            height: 100px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid #1d4ed8;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                visibility: visible;
             }
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .loader-text {
+            color: #1d4ed8;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .NavtBtn {
+            color: #1d4ed8 !important;
+            font-weight: 800;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .NavtBtn:hover {
+            border-color: rgba(29, 78, 216, 0.5);
+            box-shadow: 0 0 8px rgba(29, 78, 216, 0.4);
+            background: transparent !important;
+            color: #1d4ed8 !important;
+        }
+
+        .navbar .nav-links a.NavtBtn {
+            font-weight: 700 !important;
         }
     </style>
 </head>
 <body>
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-wrapper">
+            <div class="spinner"></div>
+            <p class="loader-text">SkillSync</p>
+        </div>
+    </div>
+
     <nav class="navbar">
         <a href="{% url 'home' %}" class="logo">SkillSync</a>
         
         <!-- Desktop Navigation -->
-        <div class="nav-links">
+        {% comment %} <div class="nav-links">
             {% if user.is_authenticated %}
                 <a href="{% url 'view_profile' user.username %}" class="profile-link" title="{{ user.username }}">
-                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile">
+                    <div class="navbar-avatar-wrapper">
+                        {% if user.profile.get_profile_picture_url %}
+                            <img src="{{ user.profile.get_profile_picture_url }}" 
+                                 class="navbar-profile-img"
+                                 data-username="{{ user.username }}"
+                                 onerror="handleImageError(this)">
+                        {% else %}
+                            <div class="navbar-avatar-fallback" style="position: static; display: flex;">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
                     <span>{{ user.username }}</span>
                 </a>
-                <a href="{% url 'add_content' %}" class="btn" title="Create Post">Create Post</a>
-                <a href="{% url 'logout' %}" class="btn logout" title="Logout">Logout</a>
+                <a href="{% url 'add_content' %}" class="NavtBtn">Create Post</a>
+                <a href="{% url 'about' %}" class="NavtBtn">About</a>
+                <a href="{% url 'logout' %}" class="NavtBtn">Logout</a>
             {% else %}
-                <a href="{% url 'login' %}" class="btn">Login</a>
-                <a href="{% url 'register' %}" class="btn">Register</a>
+                <a href="{% url 'login' %}" class="NavtBtn">Login</a>
+                <a href="{% url 'register' %}" class="NavtBtn">Register</a>
+                <a href="{% url 'about' %}" class="NavtBtn">About</a>
             {% endif %}
-            <a href="{% url 'about' %}" class="btn">About</a>
-        </div>
+        </div> {% endcomment %}
+        <div class="nav-links">
+    {% if user.is_authenticated %}
+        <a href="{% url 'view_profile' user.username %}" class="profile-link" title="{{ user.username }}">
+            <div class="navbar-avatar-wrapper">
+                {% if user.profile.profile_picture and user.profile.get_profile_picture_url %}
+                    <img src="{{ user.profile.get_profile_picture_url }}" 
+                         class="navbar-profile-img"
+                         alt="{{ user.username }}"
+                         onerror="handleImageError(this)">
+                {% else %}
+                    <div class="navbar-avatar-fallback" style="position: static; display: flex;">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            <span>{{ user.username }}</span>
+        </a>
+        <a href="{% url 'add_content' %}" class="NavtBtn">Create Post</a>
+        <a href="{% url 'about' %}" class="NavtBtn">About</a>
+        <a href="{% url 'logout' %}" class="NavtBtn">Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="NavtBtn">Login</a>
+        <a href="{% url 'register' %}" class="NavtBtn">Register</a>
+        <a href="{% url 'about' %}" class="NavtBtn">About</a>
+    {% endif %}
+</div>
 
         <!-- Hamburger Menu Icon -->
         <div class="hamburger" id="hamburger">
@@ -391,21 +810,91 @@
         </div>
     </nav>
 
+    <!-- Menu Backdrop -->
+    <div class="menu-backdrop" id="menu-backdrop"></div>
+
     <!-- Mobile Navigation Menu -->
     <div class="mobile-menu" id="mobile-menu">
-        {% if user.is_authenticated %}
-            <a href="{% url 'view_profile' user.username %}" class="profile-link">
-                <img src="{{ user.profile.profile_picture.url }}" alt="Profile">
-                <span>{{ user.username }}</span>
-            </a>
-            <a href="{% url 'add_content' %}" class="btn">📝 Create Post</a>
-            <a href="{% url 'about' %}" class="btn">ℹ️ About</a>
-            <a href="{% url 'logout' %}" class="btn logout">🚪 Logout</a>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn">🔑 Login</a>
-            <a href="{% url 'register' %}" class="btn">📝 Register</a>
-            <a href="{% url 'about' %}" class="btn">ℹ️ About</a>
-        {% endif %}
+        <div class="mobile-menu-header">
+            <div class="logo-text">SkillSync</div>
+        </div>
+
+        {% comment %} <div class="mobile-menu-content">
+            {% if user.is_authenticated %}
+                <a href="{% url 'view_profile' user.username %}" class="profile-section">
+                    <div class="mobile-menu-avatar-wrapper">
+                        {% if user.profile.get_profile_picture_url %}
+                            <img src="{{ user.profile.get_profile_picture_url }}" 
+                                 alt="Profile"
+                                 class="mobile-menu-profile-img"
+                                 data-username="{{ user.username }}"
+                                 onerror="handleImageError(this)">
+                        {% else %}
+                            <div class="mobile-menu-avatar-fallback" style="position: static; display: flex;">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">{{ user.username }}</div>
+                        <div class="profile-email">View Profile</div>
+                    </div>
+                </a>
+
+                <a href="{% url 'add_content' %}">📝 Create Post</a>
+                <a href="{% url 'about' %}">ℹ️ About</a>
+
+                <div class="action-buttons">
+                    <a href="{% url 'logout' %}" class="action-btn logout">🚪 Logout</a>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}">🔑 Login</a>
+                <a href="{% url 'about' %}">ℹ️ About</a>
+
+                <div class="action-buttons">
+                    <a href="{% url 'login' %}" class="action-btn">Login</a>
+                    <a href="{% url 'register' %}" class="action-btn">Register</a>
+                </div>
+            {% endif %}
+        </div> {% endcomment %}
+        <div class="mobile-menu-content">
+    {% if user.is_authenticated %}
+        <a href="{% url 'view_profile' user.username %}" class="profile-section">
+            <div class="mobile-menu-avatar-wrapper">
+                {% if user.profile.profile_picture and user.profile.get_profile_picture_url %}
+                    <img src="{{ user.profile.get_profile_picture_url }}" 
+                         alt="Profile"
+                         class="mobile-menu-profile-img"
+                         onerror="handleImageError(this)">
+                {% else %}
+                    <div class="mobile-menu-avatar-fallback" style="position: static; display: flex;">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <div class="profile-name">{{ user.username }}</div>
+                <div class="profile-email">View Profile</div>
+            </div>
+        </a>
+
+        <a href="{% url 'add_content' %}">📝 Create Post</a>
+        <a href="{% url 'about' %}">ℹ️ About</a>
+
+        <div class="action-buttons">
+            <a href="{% url 'logout' %}" class="action-btn logout">🚪 Logout</a>
+        </div>
+    {% else %}
+        <a href="{% url 'login' %}">🔑 Login</a>
+        <a href="{% url 'about' %}">ℹ️ About</a>
+
+        <div class="action-buttons">
+            <a href="{% url 'login' %}" class="action-btn">Login</a>
+            <a href="{% url 'register' %}" class="action-btn">Register</a>
+        </div>
+    {% endif %}
+</div>
+
     </div>
 
     <div class="main-container">
@@ -413,13 +902,42 @@
     </div>
 
     <script>
+        // Page Loader - Hide after 1.5-2 seconds
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const pageLoader = document.getElementById('pageLoader');
+                if (pageLoader) {
+                    pageLoader.classList.add('hidden');
+                }
+            }, 1500); // 1.5 seconds
+        });
+
+        // Handle image load errors and show fallback avatar
+        function handleImageError(img) {
+            const username = img.getAttribute('data-username') || 'U';
+            const firstLetter = username.charAt(0).toUpperCase();
+            const wrapper = img.closest('.navbar-avatar-wrapper, .mobile-menu-avatar-wrapper, .avatar-wrapper');
+            
+            if (wrapper) {
+                img.style.display = 'none';
+                let fallback = wrapper.querySelector('.navbar-avatar-fallback, .mobile-menu-avatar-fallback, .avatar-fallback');
+                if (fallback) {
+                    fallback.style.display = 'flex';
+                    fallback.textContent = firstLetter;
+                }
+            }
+        }
+
         // Hamburger menu toggle
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobile-menu');
+        const menuBackdrop = document.getElementById('menu-backdrop');
 
-        hamburger.addEventListener('click', () => {
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
             hamburger.classList.toggle('active');
             mobileMenu.classList.toggle('active');
+            menuBackdrop.classList.toggle('active');
         });
 
         // Close menu when a link is clicked
@@ -428,7 +946,15 @@
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 mobileMenu.classList.remove('active');
+                menuBackdrop.classList.remove('active');
             });
+        });
+
+        // Close menu when backdrop is clicked
+        menuBackdrop.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            menuBackdrop.classList.remove('active');
         });
 
         // Close menu when clicking outside
@@ -436,7 +962,20 @@
             if (!e.target.closest('.navbar') && !e.target.closest('.mobile-menu')) {
                 hamburger.classList.remove('active');
                 mobileMenu.classList.remove('active');
+                menuBackdrop.classList.remove('active');
             }
+        });
+
+        // Check for broken images on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.navbar-profile-img, .mobile-menu-profile-img').forEach(img => {
+                if (img.complete && img.naturalHeight === 0) {
+                    handleImageError(img);
+                }
+                img.addEventListener('error', function() {
+                    handleImageError(this);
+                });
+            });
         });
     </script>
 </body>

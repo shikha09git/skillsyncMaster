@@ -42,7 +42,6 @@
 .login .form-row label {
     display: block;
     line-height: 2em;
-    text-align: center;
 }
 
 .login .form-row #id_username, .login .form-row #id_password {

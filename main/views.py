@@ -10,7 +10,11 @@ import json
 
 def home(request):
     contents = Content.objects.all().order_by('-created_at')
-    return render(request, 'home.html', {'contents': contents})
+    context = {
+        'contents': contents,
+        'default_avatar': True
+    }
+    return render(request, 'home.html', context)
 
 def register(request):
     if request.method == 'POST':
@@ -152,3 +156,20 @@ def delete_content(request, course_id):
 
 def about(request):
     return render(request, 'about.html')
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.user != comment.user:
+        return JsonResponse({"success": False})
+
+    post = comment.post
+    comment.delete()
+
+    return JsonResponse({
+        "success": True,
+        "post_id": post.id,
+        "total_comments": post.comments.count()
+    })

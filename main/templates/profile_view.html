@@ -4,48 +4,237 @@
 {% block title %}{{ profile.user.username }} - Profile{% endblock %}
 
 {% block content %}
-<div class="profile-container" style="max-width: 800px; margin: 50px auto; display: flex; flex-direction: column; align-items: center; gap: 30px;">
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 50px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        padding: 20px;
+    }
 
+    .profile-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* Avatar Wrapper */
+    .profile-avatar-wrapper {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-avatar-img {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #1d4ed8;
+    }
+
+    .profile-avatar-fallback {
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 3px solid #1d4ed8;
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+        color: white;
+        font-weight: 700;
+        font-size: 48px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-avatar-img.broken ~ .profile-avatar-fallback {
+        display: flex;
+    }
+
+    .profile-card h2 {
+        margin: 0;
+        font-size: 28px;
+        color: #1f2937;
+    }
+
+    .profile-card p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 16px;
+    }
+
+    .profile-card .about {
+        text-align: center;
+        color: #666;
+        font-size: 15px;
+        line-height: 1.6;
+        max-width: 600px;
+    }
+
+    .edit-btn {
+        padding: 10px 24px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .edit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+    }
+
+    .user-posts {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .user-posts h3 {
+        margin-bottom: 10px;
+        border-bottom: 2px solid #1d4ed8;
+        padding-bottom: 10px;
+        color: #1f2937;
+        font-size: 18px;
+    }
+
+    .post-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .post-card:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .post-card h4 {
+        margin: 0 0 10px 0;
+        color: #1f2937;
+    }
+
+    .post-card p {
+        margin: 0 0 10px 0;
+        color: #4b5563;
+    }
+
+    .post-actions {
+        margin-top: 15px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .like-btn {
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        color: #6b7280;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .like-btn:hover {
+        background: rgba(29, 78, 216, 0.08);
+        color: #1d4ed8;
+    }
+
+    .like-btn.liked {
+        color: #ef4444;
+    }
+
+    .no-posts {
+        text-align: center;
+        color: #9ca3af;
+        font-size: 16px;
+        padding: 40px 20px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            margin: 30px auto;
+        }
+
+        .profile-card {
+            padding: 20px;
+        }
+
+        .profile-card h2 {
+            font-size: 24px;
+        }
+
+        .user-posts h3 {
+            font-size: 16px;
+        }
+    }
+</style>
+
+<div class="profile-container">
     <!-- Profile Card -->
-    <div class="profile-card" style="width: 100%; background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-
-        <!-- Profile Picture -->
-        {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture"
-                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff;">
-        {% else %}
-            <img src="{% static 'images/default-profile.png' %}" alt="Default Profile Picture"
-                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff;">
-        {% endif %}
+    <div class="profile-card">
+        <!-- Profile Picture with Fallback -->
+        <div class="profile-avatar-wrapper">
+            {% if profile.profile_picture and profile.get_profile_picture_url %}
+                <img src="{{ profile.get_profile_picture_url }}" 
+                     alt="Profile Picture"
+                     class="profile-avatar-img"
+                     onerror="handleProfileImageError(this)">
+            {% else %}
+                <div class="profile-avatar-fallback" style="position: static; display: flex;">
+                    {{ profile.user.username|first|upper }}
+                </div>
+            {% endif %}
+        </div>
 
         <!-- Name and Profession -->
-        <h2 style="margin: 0;">{{ profile.full_name|default:profile.user.username }}</h2>
+        <h2>{{ profile.full_name|default:profile.user.username }}</h2>
         {% if profile.profession %}
-            <p style="color: #555; font-size: 16px; margin: 5px 0;">{{ profile.profession }}</p>
+            <p>{{ profile.profession }}</p>
         {% endif %}
 
         <!-- About -->
         {% if profile.about %}
-            <p style="text-align: center; color: #666; font-size: 14px; line-height: 1.5; max-width: 600px;">
-                {{ profile.about }}
-            </p>
+            <p class="about">{{ profile.about }}</p>
         {% endif %}
 
         <!-- Edit Profile Button (only for own profile) -->
         {% if request.user == profile.user %}
-            <a href="{% url 'edit_profile' %}" 
-               style="padding: 10px 20px; border-radius: 8px; background: #007bff; color: #fff; text-decoration: none; font-weight: 500; transition: 0.3s;">
-                Edit Profile
+            <a href="{% url 'edit_profile' %}" class="edit-btn">
+                ✏️ Edit Profile
             </a>
         {% endif %}
     </div>
 
     <!-- User Posts -->
-    <div class="user-posts" style="width: 100%; display: flex; flex-direction: column; gap: 20px;">
-        <h3 style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Posts by {{ profile.full_name|default:profile.user.username }}</h3>
+    <div class="user-posts">
+        <h3>Posts by {{ profile.full_name|default:profile.user.username }}</h3>
         
         {% for content in user_posts %}
-            <div class="post-card" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+            <div class="post-card">
                 <h4>{{ content.title }}</h4>
                 <p>{{ content.description }}</p>
 
@@ -54,31 +243,60 @@
                 {% endif %}
 
                 {% if content.video %}
-                    <video width="100%" controls style="margin-top: 10px;">
+                    <video width="100%" controls style="margin-top: 10px; border-radius: 10px;">
                         <source src="{{ content.video.url }}" type="video/mp4">
                         Your browser does not support video playback.
                     </video>
                 {% endif %}
 
-                <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                <div class="post-actions">
                     <!-- Like Button -->
-                    <form method="POST" action="{% url 'like_content' content.id %}">
+                    <form method="POST" action="{% url 'like_content' content.id %}" style="margin: 0;">
                         {% csrf_token %}
-                        {% if user in content.likes.all %}
-                            <button type="submit" style="border:none; background: none; cursor:pointer; color: #dc3545;">❤️ {{ content.likes.count }}</button>
-                        {% else %}
-                            <button type="submit" style="border:none; background: none; cursor:pointer; color: #007bff;">👍 {{ content.likes.count }}</button>
-                        {% endif %}
+                        <button type="submit" class="like-btn {% if user in content.likes.all %}liked{% endif %}">
+                            {% if user in content.likes.all %}
+                                ❤️ {{ content.likes.count }}
+                            {% else %}
+                                👍 {{ content.likes.count }}
+                            {% endif %}
+                        </button>
                     </form>
 
                     <!-- Comment Count -->
-                    <span style="color: #555;">💬 {{ content.comment_set.count }}</span>
+                    <span style="color: #6b7280; font-weight: 600;">💬 {{ content.comment_set.count }}</span>
                 </div>
             </div>
         {% empty %}
-            <p style="text-align: center; color: #777;">No posts yet.</p>
+            <div class="no-posts">
+                <p>📝 No posts yet.</p>
+            </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+    function handleProfileImageError(img) {
+        const wrapper = img.closest('.profile-avatar-wrapper');
+        if (wrapper) {
+            img.style.display = 'none';
+            img.classList.add('broken');
+            let fallback = wrapper.querySelector('.profile-avatar-fallback');
+            if (fallback) {
+                fallback.style.display = 'flex';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.profile-avatar-img').forEach(img => {
+            if (img.complete && img.naturalHeight === 0) {
+                handleProfileImageError(img);
+            }
+            img.addEventListener('error', function() {
+                handleProfileImageError(this);
+            });
+        });
+    });
+</script>
 
 {% endblock %}

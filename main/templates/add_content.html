@@ -1,14 +1,149 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block title %}Add Content - SkillSync{% endblock %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="card shadow p-4" style="width: 100%; max-width: 600px; border-radius: 15px;">
-        <h2 class="text-center mb-4">Add New Content</h2>
+
+<style>
+/* Center the card */
+.center-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: transparent;
+    padding: 20px;
+}
+
+/* Content Card */
+.content-card {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 20px;
+    background: #ffffff;
+    padding: 30px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Form container */
+.form-container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Heading */
+.content-card h2 {
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #2d3748;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Labels */
+.form-label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Input fields */
+.form-control {
+    width: 100%;              
+    box-sizing: border-box;   
+    border-radius: 10px;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-bottom: 15px;       
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+/* Buttons */
+.btn-primary {
+    background: #1d4ed8;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(179, 189, 236, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 124, 195, 0.6);
+}
+
+/* Alert messages */
+.alert-info {
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+    border-radius: 10px;
+    border: none;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+}
+
+/* Back link */
+.content-card p a {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.content-card p a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Media fields side by side on larger screens */
+.media-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media(min-width: 768px) {
+    .media-row {
+        flex-direction: row;
+        gap: 15px;
+    }
+    .media-row .media-col {
+        flex: 1;
+    }
+}
+</style>
+
+<div class="center-card">
+    <div class="content-card">
+
+        <h2>Add New Content</h2>
 
         {% if messages %}
             {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -16,10 +151,56 @@
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
 
-            <button type="submit" class="btn btn-primary w-100 mt-3">Add Content</button>
+            <div class="form-container">
+                <!-- Title -->
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    {{ form.title }}
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+
+                <!-- Instructor -->
+                <div class="mb-3">
+                    <label class="form-label">Instructor</label>
+                    {{ form.instructor }}
+                </div>
+
+                <!-- Duration -->
+                <div class="mb-3">
+                    <label class="form-label">Duration</label>
+                    {{ form.duration }}
+                </div>
+
+                <!-- Media Uploads: Image & Video -->
+                <div class="media-row">
+                    <div class="media-col">
+                        <label class="form-label">Upload Image</label>
+                        {{ form.image }}
+                    </div>
+
+                    <div class="media-col">
+                        <label class="form-label">Upload Video</label>
+                        {{ form.video }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary">Add Content</button>
+            </div>
         </form>
+
+        <p class="text-center mt-3">
+            <a href="{% url 'home' %}">Back to Home</a>
+        </p>
+
     </div>
 </div>
+
 {% endblock %}

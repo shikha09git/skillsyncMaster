@@ -1,72 +1,15 @@
 {% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Edit Profile - SkillSync{% endblock %}
+{% block title %}Edit Profile{% endblock %}
 
 {% block content %}
-<div class="edit-profile-container" style="max-width: 500px; margin: 50px auto; padding: 30px; background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-    <h2 style="text-align: center; margin-bottom: 25px; font-weight: 600;">Edit Profile</h2>
-
-    {% if messages %}
-        {% for message in messages %}
-            <div style="margin-bottom: 15px; padding: 10px; border-radius: 5px; background: {% if message.tags == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; color: {% if message.tags == 'success' %}#155724{% else %}#721c24{% endif %};">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px;">
-        {% csrf_token %}
-
-        <!-- Profile Picture -->
-        <div style="text-align: center;">
-            {% if form.instance.profile_picture %}
-                <img src="{{ form.instance.profile_picture.url }}" alt="Profile Picture" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:2px solid #007bff;">
-            {% endif %}
-            {{ form.profile_picture }}
-        </div>
-
-        <!-- Full Name -->
-        <div>
-            {{ form.full_name.label_tag }}
-            {{ form.full_name }}
-        </div>
-
-        <!-- Profession -->
-        <div>
-            {{ form.profession.label_tag }}
-            {{ form.profession }}
-        </div>
-
-        <!-- About -->
-        <div>
-            {{ form.about.label_tag }}
-            {{ form.about }}
-        </div>
-
-        <button type="submit" style="padding: 10px; border:none; border-radius:8px; background:#007bff; color:#fff; font-weight:500; cursor:pointer; transition:0.3s;">
-            Save Changes
-        </button>
-    </form>
+<div class="container mt-5">
+    <div class="card shadow p-4" style="max-width: 600px; margin: auto; border-radius: 15px;">
+        <h3 class="text-center mb-4">Edit Your Profile</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success w-100 mt-2">Save Changes</button>
+        </form>
+    </div>
 </div>
-
-<style>
-    input, textarea {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-        outline: none;
-        transition: border 0.3s;
-    }
-    input:focus, textarea:focus {
-        border-color: #007bff;
-    }
-    textarea {
-        resize: vertical;
-        min-height: 80px;
-    }
-</style>
 {% endblock %}
-

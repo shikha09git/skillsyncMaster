@@ -12,7 +12,20 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-
+    
+    # ✅ ADD THIS METHOD - This is CRUCIAL
+    def get_profile_picture_url(self):
+        '''Returns profile picture URL if file exists, otherwise None'''
+        if self.profile_picture:
+            try:
+                # Check if file actually exists
+                if self.profile_picture.storage.exists(self.profile_picture.name):
+                    # Make sure it's not the default placeholder
+                    if 'default' not in self.profile_picture.name:
+                        return self.profile_picture.url
+            except:
+                pass
+        return None
 
 class Content(models.Model):
     title = models.CharField(max_length=200)
@@ -33,9 +46,7 @@ class Content(models.Model):
     def __str__(self):
         return self.title
 
-
 class Comment(models.Model):
-   
     content = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='comment_set')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
@@ -44,13 +55,11 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.content.title}"
 
-
 # 🔹 Automatically create a profile for each new user
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
