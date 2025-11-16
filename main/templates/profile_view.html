@@ -191,6 +191,93 @@
             font-size: 16px;
         }
     }
+
+    /* ===== DARK MODE STYLES ===== */
+    body.dark-mode .profile-container {
+        background: transparent;
+    }
+
+    body.dark-mode .profile-card {
+        background: #1e293b;
+        color: #e2e8f0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode .profile-card:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode .profile-avatar-img {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+
+    body.dark-mode .profile-avatar-fallback {
+        border-color: #3b82f6;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+
+    body.dark-mode .profile-card h2 {
+        color: #e0e7ff;
+    }
+
+    body.dark-mode .profile-card p {
+        color: #cbd5e1;
+    }
+
+    body.dark-mode .profile-card .about {
+        color: #cbd5e1;
+    }
+
+    body.dark-mode .edit-btn {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    body.dark-mode .edit-btn:hover {
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    body.dark-mode .user-posts h3 {
+        border-bottom-color: #3b82f6;
+        color: #e0e7ff;
+    }
+
+    body.dark-mode .post-card {
+        background: #1e293b;
+        color: #e2e8f0;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode .post-card:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode .post-card h4 {
+        color: #e0e7ff;
+    }
+
+    body.dark-mode .post-card p {
+        color: #cbd5e1;
+    }
+
+    body.dark-mode .like-btn {
+        color: #94a3b8;
+    }
+
+    body.dark-mode .like-btn:hover {
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+    }
+
+    body.dark-mode .like-btn.liked {
+        color: #f87171;
+    }
+
+    body.dark-mode .no-posts {
+        color: #64748b;
+    }
 </style>
 
 <div class="profile-container">

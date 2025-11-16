@@ -5,10 +5,68 @@
 
 {% block content %}
 
+<style>
+/* About Section Styling */
+.about-section {
+    margin-top: 50px;
+    background: #f9fafb;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.about-section h3 {
+    color: #0d6efd;
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+
+.about-section p {
+    color: #444;
+    font-size: 15px;
+    max-width: 900px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.about-section img {
+    max-width: 380px;
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 14px;
+}
+
+.about-section .about-footer {
+    color: #666;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+/* Dark Mode Styles for About */
+body.dark-mode .about-section {
+    background: #1e293b;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .about-section h3 {
+    color: #60a5fa;
+}
+
+body.dark-mode .about-section p {
+    color: #cbd5e1;
+}
+
+body.dark-mode .about-section .about-footer {
+    color: #94a3b8;
+}
+</style>
+
 <!-- About Section -->
-<section style="margin-top:50px; background:#f9fafb; padding:30px; border-radius:12px; text-align:center; box-shadow:0 3px 10px rgba(0,0,0,0.05);">
-  <h3 style="color:#0d6efd; font-size:22px; margin-bottom:12px;">About SkillSync</h3>
-  <p style="color:#444; font-size:15px; max-width:900px; margin:0 auto 20px; line-height:1.6; text-align:left;">
+<section class="about-section">
+  <h3>About SkillSync</h3>
+  <p>
     SkillSync is a collaborative learning platform designed to help students, developers, and professionals share their projects and grow together.  
     It offers a simple way to post your work, receive feedback, and explore what others are building.  
     The platform encourages community learning by connecting people who are passionate about coding, technology, and creativity.
@@ -17,11 +75,9 @@
     Our goal is to make learning engaging, interactive, and accessible to everyone.
   </p>
 
-  <img src="{% static 'images/about.webp' %}" alt="About SkillSync" style="max-width:380px; width:100%; border-radius:10px; margin-top:14px;">
-  <p style="color:#666; font-size:13px; margin-top:10px;">Empowering learners to grow, share, and succeed together.</p>
+  <img src="{% static 'images/about.webp' %}" alt="About SkillSync">
+  <p class="about-footer">Empowering learners to grow, share, and succeed together.</p>
 </section>
-
-
 
 {% endblock %}
 
