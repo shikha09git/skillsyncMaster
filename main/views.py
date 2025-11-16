@@ -21,14 +21,71 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+# def register(request):
+#     if request.method == 'POST':
+#         form = registerForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('login')
+#     else:
+#         form = registerForm()
+#     return render(request, 'register.html', {'form': form})
+
 def register(request):
+    """
+    Handle user registration with welcome email and success notification
+    
+    This view:
+    - Validates user registration form
+    - Creates new user account
+    - Sends welcome email to new user
+    - Shows success popup message
+    - Redirects to login page
+    """
     if request.method == 'POST':
         form = registerForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')
+            try:
+                # Save user to database
+                user = form.save()
+                
+                # Send welcome email
+                email_sent = send_registration_welcome_email(user, user.email)
+                
+                if email_sent:
+                    # Success message with email confirmation
+                    messages.success(
+                        request,
+                        f'✅ Registration Successful! Welcome {user.username}! 🎉\n\nA welcome email has been sent to {user.email}. Please check your inbox.',
+                        extra_tags='registration_success'
+                    )
+                else:
+                    # Success but email failed
+                    messages.warning(
+                        request,
+                        f'✅ Registration Successful! Welcome {user.username}!\n\nNote: Welcome email could not be sent. You can proceed to login.',
+                        extra_tags='registration_warning'
+                    )
+                
+                return redirect('login')
+            
+            except Exception as e:
+                messages.error(
+                    request,
+                    f'❌ Error during registration. Please try again.',
+                    extra_tags='registration_error'
+                )
+                print(f"Registration error: {str(e)}")
+        
+        else:
+            # Form validation errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    
     else:
         form = registerForm()
+    
     return render(request, 'register.html', {'form': form})
 
 def guest_login(request):
@@ -397,3 +454,57 @@ def reset_password(request, user_id):
         return redirect('login')
     
     return render(request, 'reset_password.html', {'user': user})
+
+def send_registration_welcome_email(user, recipient_email):
+    """
+    Send welcome email to newly registered user
+    
+    This function sends a professionally formatted HTML email to welcome the user
+    to SkillSync. It includes account details, getting started instructions, and
+    encourages them to explore the platform.
+    
+    Args:
+        user (User): Django User object containing username and other user details
+        recipient_email (str): User's email address where welcome email will be sent
+    
+    Returns:
+        bool: True if email sent successfully, False otherwise
+    
+    Raises:
+        Catches and logs any email sending exceptions internally
+    
+    Example:
+        >>> user = User.objects.create_user(username='john_doe', email='john@example.com')
+        >>> success = send_registration_welcome_email(user, 'john@example.com')
+        >>> if success:
+        ...     messages.success(request, 'Welcome email sent!')
+    """
+    try:
+        # Prepare context for email template
+        context = {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name or user.username,
+            'registration_date': user.date_joined.strftime('%B %d, %Y'),
+            'support_email': settings.DEFAULT_FROM_EMAIL,
+            'dashboard_url': settings.SITE_URL if hasattr(settings, 'SITE_URL') else 'https://skillsync.com',
+        }
+        
+        # Render HTML email template
+        html_message = render_to_string('emails/registration_welcome_email.html', context)
+        
+        # Send email
+        send_mail(
+            subject='Welcome to SkillSync! 🎉',
+            message=f'Welcome {user.username}! Thank you for joining SkillSync.',  # Fallback plain text
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient_email],
+            html_message=html_message,  # Send HTML version
+            fail_silently=False,
+        )
+        
+        return True
+    
+    except Exception as e:
+        print(f"Error sending registration welcome email: {str(e)}")
+        return False

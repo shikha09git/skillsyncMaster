@@ -3,6 +3,9 @@
 
 {% block content %}
 
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 /* Center the card */
 .center-card {
@@ -59,16 +62,43 @@
     display: block;
 }
 
+/* Password input wrapper */
+.password-input-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: 15px;
+    height: 48px;
+}
+
 /* Form control */
 .form-control {
     width: 100%;              
     box-sizing: border-box;   
     border-radius: 10px;
-    padding: 12px 16px;
-    border: 2px solid #e2e8f0;
+    padding: 10px 10px;
+    border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
     font-size: 1rem;
-    margin-bottom: 15px;
+    height: 48px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+    color: #2d3748;
+}
+
+.form-control::placeholder {
+    color: #cbd5e1;
+    opacity: 1;
+}
+
+.password-input-wrapper .form-control {
+    padding-right: 48px;
+    flex: 1;
+    width: 100%;
+}
+
+.form-control:hover {
+    border-color: #cbd5e1;
 }
 
 .form-control:focus {
@@ -84,6 +114,41 @@
 .form-control.is-invalid:focus {
     border-color: #f56565;
     box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+}
+
+/* Password visibility toggle button */
+.password-toggle-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;
+    color: #667eea;
+    padding: 0 !important;
+    z-index: 10;
+    transition: color 0.3s ease;
+    height: 24px;
+    width: 24px;
+    min-width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: none !important;
+    font-size: 18px;
+}
+
+.password-toggle-btn i {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.password-toggle-btn:focus {
+    outline: none;
 }
 
 /* Invalid feedback */
@@ -235,6 +300,14 @@ body.dark-mode .register-card p a {
 body.dark-mode .register-card p a:hover {
     color: #93c5fd;
 }
+
+body.dark-mode .password-toggle-btn {
+    color: #60a5fa;
+}
+
+body.dark-mode .password-toggle-btn:focus {
+    outline: none;
+}
 </style>
 
 <div class="center-card">
@@ -280,9 +353,14 @@ body.dark-mode .register-card p a:hover {
                 <!-- PASSWORD -->
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password1"
-                           class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
-                           placeholder="Create a password" required>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="id_password1" name="password1"
+                               class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                               placeholder="Create a password" required>
+                        <button type="button" class="password-toggle-btn" id="icon-id_password1" onclick="togglePassword('id_password1')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                     {% for error in form.password1.errors %}
                         <div class="invalid-feedback">{{ error }}</div>
                     {% endfor %}
@@ -291,9 +369,11 @@ body.dark-mode .register-card p a:hover {
                 <!-- CONFIRM PASSWORD -->
                 <div class="mb-3">
                     <label class="form-label">Confirm Password</label>
-                    <input type="password" name="password2"
-                           class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
-                           placeholder="Confirm password" required>
+                    <div class="password-input-wrapper" style="height: auto;">
+                        <input type="password" id="id_password2" name="password2"
+                               class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                               placeholder="Confirm password" required style="margin-bottom: 0;">
+                    </div>
                     {% for error in form.password2.errors %}
                         <div class="invalid-feedback">{{ error }}</div>
                     {% endfor %}
@@ -309,5 +389,20 @@ body.dark-mode .register-card p a:hover {
 
     </div>
 </div>
+
+<script>
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById('icon-' + inputId);
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        input.type = 'password';
+        icon.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+}
+</script>
 
 {% endblock %}
