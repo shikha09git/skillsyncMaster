@@ -402,6 +402,15 @@
         margin-bottom: 16px;
     }
 
+    /* PDF Viewer Styles */
+    .pdf-viewer {
+        border: 1px solid #ccc;
+        padding: 10px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        margin-top: 8px;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .posts-container {
@@ -487,6 +496,13 @@
                     {% elif content.video %}
                         <div class="post-media-placeholder">🎬</div>
                     {% endif %}
+                        {% if content.pdf %}
+                            <div style="margin-top:10px;">
+                                <a href="/media/{{ content.pdf.name }}" target="_blank" style="color:#1d4ed8;font-weight:600;">
+                                    📄 Download PDF
+                                </a>
+                            </div>
+                        {% endif %}
                 </div>
 
                 <!-- Post Footer -->
@@ -564,10 +580,85 @@
                         {% endif %}
 
                         {% if content.video %}
-                            <video width="100%" controls style="border-radius: 12px; margin-bottom: 24px;">
-                                <source src="{{ content.video.url }}" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
+                            <div style="margin-top:24px; margin-bottom:24px;">
+                                <video width="100%" controls style="border-radius:12px; border:1px solid #e5e7eb; background:#f9f9f9; display:block;">
+                                    <source src="/media/{{ content.video.name }}" type="video/mp4">
+                                    Your browser does not support video playback.
+                                </video>
+                            </div>
+                        {% endif %}
+
+                        {% if content.pdf %}
+                            <div style="margin-top:24px;">
+                                <a href="/media/{{ content.pdf.name }}" target="_blank" style="color:#1d4ed8;font-weight:600; display:inline-block; margin-bottom:12px;">
+                                    📄 Download PDF
+                                </a>
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+                                <div id="pdf-viewer-{{ content.id }}" class="pdf-viewer" style="width:100%; background:#f9f9f9; border:1px solid #e5e7eb; border-radius:12px; padding:20px; margin-top:12px;">
+                                    <div style="display:flex; justify-content:center;">
+                                        <canvas id="pdf-canvas-{{ content.id }}" style="max-width:100%; height:auto; box-shadow:0 1px 3px rgba(0,0,0,0.08);"></canvas>
+                                    </div>
+                                    <div id="pdf-controls-{{ content.id }}" style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:16px; display:none;">
+                                        <button class="pdf-prev-btn" data-pdf-id="{{ content.id }}" style="padding:8px 12px; background:#1d4ed8; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600; transition:all 0.3s ease;">
+                                            ← Previous
+                                        </button>
+                                        <span id="pdf-page-info-{{ content.id }}" style="font-size:14px; color:#6b7280; font-weight:600;"></span>
+                                        <button class="pdf-next-btn" data-pdf-id="{{ content.id }}" style="padding:8px 12px; background:#1d4ed8; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600; transition:all 0.3s ease;">
+                                            Next →
+                                        </button>
+                                    </div>
+                                </div>
+                                <script>
+                                    (function() {
+                                        const pdfUrl = "/media/{{ content.pdf.name }}";
+                                        const contentId = {{ content.id }};
+                                        const canvasId = `pdf-canvas-${contentId}`;
+                                        const controlsId = `pdf-controls-${contentId}`;
+                                        const pageInfoId = `pdf-page-info-${contentId}`;
+                                        let pdfDoc = null;
+                                        let currentPage = 1;
+
+                                        const renderPage = (pageNum) => {
+                                            pdfDoc.getPage(pageNum).then(page => {
+                                                const canvas = document.getElementById(canvasId);
+                                                const ctx = canvas.getContext('2d');
+                                                const viewport = page.getViewport({scale: 1.8});
+                                                canvas.width = viewport.width;
+                                                canvas.height = viewport.height;
+                                                page.render({canvasContext: ctx, viewport: viewport});
+                                                
+                                                document.getElementById(pageInfoId).textContent = `Page ${pageNum} of ${pdfDoc.numPages}`;
+                                                currentPage = pageNum;
+
+                                                document.querySelector(`button.pdf-prev-btn[data-pdf-id="${contentId}"]`).disabled = pageNum === 1;
+                                                document.querySelector(`button.pdf-next-btn[data-pdf-id="${contentId}"]`).disabled = pageNum === pdfDoc.numPages;
+                                            });
+                                        };
+
+                                        pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
+                                            pdfDoc = pdf;
+                                            renderPage(1);
+
+                                            if (pdf.numPages > 1) {
+                                                document.getElementById(controlsId).style.display = 'flex';
+                                            }
+
+                                            document.querySelector(`button.pdf-prev-btn[data-pdf-id="${contentId}"]`).addEventListener('click', () => {
+                                                if (currentPage > 1) renderPage(currentPage - 1);
+                                            });
+
+                                            document.querySelector(`button.pdf-next-btn[data-pdf-id="${contentId}"]`).addEventListener('click', () => {
+                                                if (currentPage < pdfDoc.numPages) renderPage(currentPage + 1);
+                                            });
+                                        }).catch(err => {
+                                            console.error('PDF loading error:', err);
+                                            document.getElementById(canvasId).style.display = 'none';
+                                            const viewer = document.getElementById(`pdf-viewer-${contentId}`);
+                                            viewer.innerHTML = '<p style="color:#ef4444; text-align:center; padding:20px;">Could not load PDF preview.</p>';
+                                        });
+                                    })();
+                                </script>
+                            </div>
                         {% endif %}
 
                         <!-- Post Actions -->
@@ -800,16 +891,13 @@
                 })
                 .then(res => {
                     console.log('Delete response status', res.status, res.statusText);
-                    // Try to parse JSON if possible
                     return res.json().catch(() => ({ success: res.ok }));
                 })
                 .then(data => {
                     console.log('Delete response data', data);
                     if (data && data.success) {
-                        // Remove comment element from DOM
                         const el = document.getElementById(`comment-${commentId}`);
                         if (el) el.remove();
-                        // decrement comment count
                         const countSpan = document.getElementById(`comment-count-${postId}`);
                         if (countSpan) countSpan.textContent = Math.max(0, parseInt(countSpan.textContent) - 1);
                     } else {
@@ -824,11 +912,8 @@
             }
         });
 
-        // Also attach direct listeners to any existing delete buttons (some browsers/contexts
-        // may not dispatch delegated events the same way). This ensures clicks are handled.
         document.querySelectorAll('.delete-comment-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                // Prevent double handling in case delegation also fires
                 e.stopPropagation();
                 e.preventDefault();
                 const target = e.currentTarget;

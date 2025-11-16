@@ -1,8 +1,6 @@
 from django.urls import path
 from . import views
-from .views import delete_comment
-from .views import delete_content
-
+from .views import delete_comment, delete_content
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -13,17 +11,11 @@ urlpatterns = [
     path('add/', views.add_content, name='add_content'),
     path('like/<int:course_id>/', views.like_content, name='like_content'),
     path('add_comment/<int:post_id>/', views.add_comment, name='add_comment'),
-    path("delete/<int:course_id>/", delete_content, name="delete_content"),
-
+    path('delete/<int:course_id>/', delete_content, name='delete_content'),
     path('profile/<str:username>/', views.view_profile, name='view_profile'),
     path('edit-profile/', views.edit_profile, name='edit_profile'),
     path('about/', views.about, name='about'),
     path('search/', views.search, name='search'),
-    # path('delete_comment/<int:comment_id>/', views.delete_comment, name='delete_comment'),
     path('comment/delete/<int:comment_id>/', delete_comment, name='delete_comment'),
     path('content/<int:content_id>/', views.content_detail, name='content_detail'),
-
-
-
-
 ]

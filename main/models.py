@@ -39,6 +39,7 @@ class Content(models.Model):
     # Upload fields
     image = models.ImageField(upload_to='content_images/', blank=True, null=True)
     video = models.FileField(upload_to='content_videos/', blank=True, null=True)
+    pdf = models.FileField(upload_to='content_pdfs/', blank=True, null=True)
 
     def total_likes(self):
         return self.likes.count()

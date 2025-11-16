@@ -1,16 +1,162 @@
+
 {% extends 'base.html' %}
-{% block title %}Edit Profile{% endblock %}
+{% block title %}Edit Profile - SkillSync{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow p-4" style="max-width: 600px; margin: auto; border-radius: 15px;">
-        <h3 class="text-center mb-4">Edit Your Profile</h3>
-        <form method="POST" enctype="multipart/form-data">
+<style>
+.center-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: transparent;
+    padding: 20px;
+}
+.register-card {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 20px;
+    background: #ffffff;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.5s ease-out;
+}
+.form-container {
+    max-width: 520px;
+    margin: 0 auto;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.register-card h2 {
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #2d3748;
+    font-size: 2rem;
+    text-align: center;
+}
+.form-label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+    display: block;
+}
+.form-control {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 10px;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+.form-control.is-invalid {
+    border-color: #f56565;
+}
+.form-control.is-invalid:focus {
+    border-color: #f56565;
+    box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+}
+.invalid-feedback {
+    display: block;
+    color: #c53030;
+    font-size: 0.875rem;
+    margin-top: -10px;
+    margin-bottom: 12px;
+}
+.btn-register {
+    background: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(179, 189, 236, 0.4);
+    width: 100%;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.btn-register:hover {
+    background: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 124, 195, 0.6);
+}
+.btn-register:active {
+    transform: translateY(0);
+}
+@media (max-width: 600px) {
+    .register-card { padding: 35px 25px; }
+    .register-card h2 { font-size: 1.75rem; }
+}
+</style>
+
+<div class="center-card">
+    <div class="register-card">
+        <h2>Edit Profile</h2>
+        {% if error %}
+        <div class="alert alert-danger">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+        <form method="POST" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-success w-100 mt-2">Save Changes</button>
+            <div class="form-container">
+                <!-- FULL NAME -->
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="full_name"
+                           class="form-control {% if form.full_name.errors %}is-invalid{% endif %}"
+                           placeholder="Enter your full name"
+                           value="{{ form.full_name.value|default:'' }}" required>
+                    {% for error in form.full_name.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- PROFESSION -->
+                <div class="mb-3">
+                    <label class="form-label">Profession</label>
+                    <input type="text" name="profession"
+                           class="form-control {% if form.profession.errors %}is-invalid{% endif %}"
+                           placeholder="Your profession"
+                           value="{{ form.profession.value|default:'' }}">
+                    {% for error in form.profession.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- ABOUT -->
+                <div class="mb-3">
+                    <label class="form-label">About</label>
+                    <textarea name="about" rows="4"
+                              class="form-control {% if form.about.errors %}is-invalid{% endif %}"
+                              placeholder="Tell us about yourself">{{ form.about.value|default:'' }}</textarea>
+                    {% for error in form.about.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- PROFILE PICTURE -->
+                <div class="mb-3">
+                    <label class="form-label">Profile Picture</label><br>
+                    {% if profile_pic_url %}
+                        <img src="{{ profile_pic_url }}" alt="Profile Picture" style="max-width: 80px; border-radius: 50%; margin-bottom: 10px;">
+                    {% endif %}
+                    <input type="file" name="profile_pic" class="form-control" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn-register">Save Changes</button>
+            </div>
         </form>
-        
     </div>
 </div>
 {% endblock %}
