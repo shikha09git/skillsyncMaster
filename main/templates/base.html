@@ -157,6 +157,89 @@
             letter-spacing: -0.5px;
         }
 
+        /* Search form in navbar */
+        .search-form {
+            margin-left: 60px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        /* Wrapper for input with left icon */
+        .search-input-wrapper {
+            position: relative;
+            display: inline-block;
+            /* increase default width for more prominent desktop presence */
+            width: 560px;
+            /* keep room for nav items on both sides */
+            max-width: calc(100% - 360px);
+            min-width: 220px;
+        }
+
+        .search-input-wrapper svg.search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            opacity: 0.86;
+            pointer-events: none;
+        }
+
+        .search-form input[type="search"] {
+            padding: 10px 14px 10px 42px; /* space for left icon */
+            border-radius: 14px;
+            border: 1px solid #e6eefb;
+            background: #f8fafc;
+            width: 100%;
+            transition: box-shadow 0.15s ease, border-color 0.15s ease;
+            font-size: 15px;
+            color: #0f172a;
+        }
+
+        .search-form input[type="search"]:focus {
+            outline: none;
+            border-color: #1d4ed8;
+            box-shadow: 0 4px 14px rgba(29, 78, 216, 0.12);
+        }
+
+        /* desktop still had a circular button but we no longer render it; keep styles in case it's reused */
+        .search-form button.search-btn {
+            display: none;
+        }
+
+        /* Mobile search inside the mobile menu */
+        .mobile-search-form {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e6eefb;
+        }
+
+        .mobile-search-form input[type="search"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e6eefb;
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            /* Keep the search visible in the navbar on mobile; reduce width so it fits */
+            .search-form {
+                display: flex;
+                flex: 1 1 auto;
+                margin-left: 12px;
+                margin-right: 12px;
+            }
+            /* let the input expand but keep sensible max; on mobile give it more room */
+            .search-input-wrapper { width: calc(100% - 120px); max-width: none; }
+            .search-input-wrapper svg.search-icon { left: 10px; }
+            .search-form input[type="search"] { padding-left: 40px; font-size: 14px; }
+
+            /* hide the mobile-menu copy (we'll keep only navbar search) */
+            .mobile-search-form { display: none; }
+        }
         .navbar .nav-links {
             display: flex;
             align-items: center;
@@ -747,6 +830,16 @@
 
     <nav class="navbar">
         <a href="{% url 'home' %}" class="logo">SkillSync</a>
+        <form action="{% url 'search' %}" method="get" class="search-form" role="search" aria-label="Search posts">
+            <div class="search-input-wrapper">
+                <!-- left inline icon -->
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M21 21L16.65 16.65" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M11 18C14.866 18 18 14.866 18 11C18 7.13401 14.866 4 11 4C7.13401 4 4 7.13401 4 11C4 14.866 7.13401 18 11 18Z" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="search" name="q" placeholder="Search posts..." aria-label="Search posts">
+            </div>
+        </form>
         
         <!-- Desktop Navigation -->
         {% comment %} <div class="nav-links">

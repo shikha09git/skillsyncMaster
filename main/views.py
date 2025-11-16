@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import registerForm, contentForm, ProfileForm
 from .models import Content, Comment, Profile
+from django.db.models import Q
 from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -180,6 +181,25 @@ def content_detail(request, content_id):
     content = get_object_or_404(Content, id=content_id)
     comments = Comment.objects.filter(content=content).order_by('-created_at')
     return render(request, 'content_detail.html', {'content': content, 'comments': comments})
+
+
+def search(request):
+    """Search contents by keyword in title, description or instructor."""
+    q = request.GET.get('q', '').strip()
+    if q:
+        contents = Content.objects.filter(
+            Q(title__icontains=q) | Q(description__icontains=q) | Q(instructor__icontains=q)
+        ).order_by('-created_at')
+    else:
+        # If empty query, show all content (helps when user submits empty search)
+        contents = Content.objects.all().order_by('-created_at')
+
+    context = {
+        'contents': contents,
+        'query': q,
+    }
+    # Reuse the home template to keep styling and post layout consistent
+    return render(request, 'home.html', context)
 
 
 @login_required
