@@ -2,12 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import registerForm, contentForm, ProfileForm
-from .models import Content, Comment, Profile
+from .models import Content, Comment, Profile, PasswordResetOTP
 from django.db.models import Q
 from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 import json
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
+
 
 def home(request):
     contents = Content.objects.all().order_by('-created_at')
@@ -224,3 +228,172 @@ def delete_comment(request, comment_id):
 
     # For non-AJAX requests, redirect back
     return redirect(request.META.get("HTTP_REFERER", "home"))
+
+
+
+def forgot_password(request):
+    """Send OTP to user's email"""
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        
+        if not email:
+            messages.error(request, 'Please enter an email address.')
+            return render(request, 'forgot_password.html')
+        
+        try:
+            user = User.objects.get(email=email)
+            otp_obj, created = PasswordResetOTP.objects.get_or_create(user=user)
+            otp = otp_obj.generate_otp()
+            
+            # Send email with OTP using HTML template
+            if send_password_reset_email(user, otp, email):
+                messages.success(request, 'OTP sent to your email address!')
+                return redirect('verify_otp', user_id=user.id)
+            else:
+                messages.error(request, 'Error sending email. Please try again.')
+        
+        except User.DoesNotExist:
+            messages.error(request, 'Email address not found in our system.')
+        except Exception as e:
+            messages.error(request, 'Error processing request. Please try again.')
+            print(f"Error: {str(e)}")
+    
+    return render(request, 'forgot_password.html')
+
+
+def send_password_reset_email(user, otp, recipient_email):
+    """
+    Send password reset email with OTP using HTML template
+    
+    This function sends a professionally formatted HTML email to the user containing
+    their one-time password (OTP) for password reset. It includes security warnings,
+    usage instructions, and a responsive design that works on all devices.
+    
+    Args:
+        user (User): Django User object containing username and other user details
+        otp (str): One-time password generated for password reset (typically 6 digits)
+        recipient_email (str): User's email address where OTP will be sent
+    
+    Returns:
+        bool: True if email sent successfully, False otherwise
+    
+    Raises:
+        Catches and logs any email sending exceptions internally
+    
+    Example:
+        >>> user = User.objects.get(id=1)
+        >>> otp = '123456'
+        >>> success = send_password_reset_email(user, otp, 'user@example.com')
+        >>> if success:
+        ...     messages.success(request, 'OTP sent to your email!')
+    """
+    try:
+        # Prepare context for email template
+        context = {
+            'username': user.username,
+            'otp': otp,
+            'otp_validity': '5 minutes',
+            'support_email': settings.DEFAULT_FROM_EMAIL,
+        }
+        
+        # Render HTML email template
+        html_message = render_to_string('emails/password_reset_email.html', context)
+        
+        # Send email
+        send_mail(
+            subject='Password Reset OTP - SkillSync',
+            message=f'Your OTP for password reset is: {otp}',  # Fallback plain text
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient_email],
+            html_message=html_message,  # Send HTML version
+            fail_silently=False,
+        )
+        
+        return True
+    
+    except Exception as e:
+        print(f"Error sending password reset email: {str(e)}")
+        return False
+
+def verify_otp(request, user_id):
+    """Verify OTP entered by user"""
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('login')
+    
+    if request.method == 'POST':
+        otp = request.POST.get('otp', '').strip()
+        
+        if not otp:
+            messages.error(request, 'Please enter the OTP.')
+            return render(request, 'verify_otp.html', {'user': user})
+        
+        try:
+            otp_obj = PasswordResetOTP.objects.get(user=user)
+            
+            if not otp_obj.is_otp_valid():
+                messages.error(request, 'OTP has expired. Please request a new one.')
+                return redirect('forgot_password')
+            
+            if otp_obj.otp == otp:
+                otp_obj.is_verified = True
+                otp_obj.save()
+                messages.success(request, 'OTP verified! Now set your new password.')
+                return redirect('reset_password', user_id=user.id)
+            else:
+                messages.error(request, 'Invalid OTP. Please try again.')
+        
+        except PasswordResetOTP.DoesNotExist:
+            messages.error(request, 'Please request OTP first.')
+            return redirect('forgot_password')
+    
+    return render(request, 'verify_otp.html', {'user': user})
+
+
+def reset_password(request, user_id):
+    """Reset password after OTP verification"""
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('login')
+    
+    try:
+        otp_obj = PasswordResetOTP.objects.get(user=user)
+        if not otp_obj.is_verified:
+            messages.error(request, 'Please verify OTP first.')
+            return redirect('verify_otp', user_id=user.id)
+    except PasswordResetOTP.DoesNotExist:
+        messages.error(request, 'Invalid request. Please start over.')
+        return redirect('forgot_password')
+    
+    if request.method == 'POST':
+        password1 = request.POST.get('password1', '').strip()
+        password2 = request.POST.get('password2', '').strip()
+        
+        # Validation
+        if not password1 or not password2:
+            messages.error(request, 'Please enter password in both fields.')
+            return render(request, 'reset_password.html', {'user': user})
+        
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'reset_password.html', {'user': user})
+        
+        if len(password1) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return render(request, 'reset_password.html', {'user': user})
+        
+        # Update password
+        user.set_password(password1)
+        user.save()
+        
+        # Clean up OTP record
+        otp_obj.delete()
+        
+        messages.success(request, 'Password reset successful! Please log in with your new password.')
+        return redirect('login')
+    
+    return render(request, 'reset_password.html', {'user': user})

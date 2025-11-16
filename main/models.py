@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
+from datetime import timedelta
+import random
+import string
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -65,3 +69,19 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+class PasswordResetOTP(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset_otp')
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now=True)
+    is_verified = models.BooleanField(default=False)
+    
+    def is_otp_valid(self):
+        expiry_time = self.created_at + timedelta(minutes=5)
+        return timezone.now() < expiry_time
+    
+    def generate_otp(self):
+        self.otp = ''.join(random.choices(string.digits, k=6))
+        self.is_verified = False
+        self.save()
+        return self.otp

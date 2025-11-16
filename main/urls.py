@@ -18,4 +18,7 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('comment/delete/<int:comment_id>/', delete_comment, name='delete_comment'),
     path('content/<int:content_id>/', views.content_detail, name='content_detail'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('verify-otp/<int:user_id>/', views.verify_otp, name='verify_otp'),
+    path('reset-password/<int:user_id>/', views.reset_password, name='reset_password'),
 ]
