@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SkillSync{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Flavors&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -1047,7 +1049,7 @@
 
     <nav class="navbar">
         <a href="{% url 'home' %}" class="logo">SkillSync</a>
-        <form action="{% url 'search' %}" method="get" class="search-form" role="search" aria-label="Search posts">
+        {% comment %} <form action="{% url 'search' %}" method="get" class="search-form" role="search" aria-label="Search posts">
             <div class="search-input-wrapper">
                 <!-- left inline icon -->
                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1056,7 +1058,7 @@
                 </svg>
                 <input type="search" name="q" placeholder="Search posts..." aria-label="Search posts">
             </div>
-        </form>
+        </form> {% endcomment %}
         
         <!-- Desktop Navigation -->
         {% comment %} <div class="nav-links">
@@ -1110,7 +1112,7 @@
         <a href="{% url 'register' %}" class="NavtBtn">Register</a>
         <a href="{% url 'about' %}" class="NavtBtn">About</a>
     {% endif %}
-    <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">🌙</button>
+    <button class="dark-mode-toggle NavtBtn" id="darkModeToggle" title="Toggle dark mode">🌙</button>
 </div>
 
         <!-- Hamburger Menu Icon -->

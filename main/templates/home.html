@@ -109,7 +109,7 @@
 
     .user-name {
         font-weight: 700;
-        color: #1f2937;
+        color: #000000ff;
         font-size: 14px;
     }
 
@@ -151,13 +151,16 @@
     /* Media Preview */
     .post-media {
         width: 100%;
-        height: 200px;
-        background: #f3f4f6;
+        height: auto;              /* auto height so image is not cut */
+        max-height: 450px;         /* optional: prevents images from becoming too tall */
         border-radius: 12px;
         overflow: hidden;
-        object-fit: cover;
+        display: block;
+        object-fit: contain;       /* show full image without cropping */
+        background: #f3f4f6;
         margin-bottom: 15px;
     }
+
 
     .post-media-placeholder {
         width: 100%;
@@ -391,6 +394,15 @@
     }
 
     /* Dark Mode Styles for Comments and Likes */
+    /* Fix user name + handle in dark mode */
+    body.dark-mode .user-name {
+        color: #e2e8f0 !important;  /* light text */
+    }
+
+    body.dark-mode .user-handle {
+        color: #94a3b8 !important;  /* soft gray */
+    }
+
     body.dark-mode .post-footer {
         background: #0f172a;
         border-top-color: #334155;
@@ -549,7 +561,115 @@
     .hidden {
         display: none !important;
     }
+
+
+  /* Search Bar Container - CENTERED */
+.search-bar-container {
+    width: 100%;
+    margin: 0 auto 5px;
+    margin-top: 40px; /* ⬆️ Top margin added */
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center; /* ⬅️ Move slightly left */
+    transform: translateX(-45px); /* slightly left — very mild */
+    padding-left: 5%; /* ⬅️ Small left offset for better look */
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 600px;
+}
+
+
+.search-input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-input-wrapper svg.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    opacity: 0.86;
+    pointer-events: none;
+}
+
+.search-form input[type="search"] {
+    padding: 10px 14px 10px 42px;
+    border-radius: 14px;
+    border: 1px solid #080808ff;
+    background: #cbe0f8ff;
+    width: 100%;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    font-size: 15px;
+    color: #0f172a;
+}
+
+.search-form input[type="search"]:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.12);
+}
+
+/* Dark mode for search bar */
+body.dark-mode .search-form input {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+}
+
+body.dark-mode .search-form input::placeholder {
+    color: #94a3b8;
+}
+
+body.dark-mode .search-icon {
+    stroke: #94a3b8;
+}
+
+@media (max-width: 768px) {
+    .search-bar-container {
+        padding: 0 16px;
+        margin-bottom: 30px;
+    }
+    .search-input-wrapper {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-bar-container {
+        padding: 0 12px;
+        margin-bottom: 24px;
+    }
+    .search-form input[type="search"] {
+        font-size: 14px;
+    }
+}
 </style>
+
+
+
+<div class="search-bar-container">
+    <form action="{% url 'search' %}" method="get" class="search-form" role="search" aria-label="Search posts">
+        <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M21 21L16.65 16.65" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11 18C14.866 18 18 14.866 18 11C18 7.13401 14.866 4 11 4C7.13401 4 4 7.13401 4 11C4 14.866 7.13401 18 11 18Z" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <input type="search" name="q" placeholder="Search posts..." aria-label="Search posts">
+        </div>
+    </form>
+</div>
 
 <div class="posts-container">
     <div class="page-header">
