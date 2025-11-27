@@ -7,6 +7,9 @@
     <title>{% block title %}SkillSync{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Flavors&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+
 
     <style>
         * {
@@ -51,6 +54,136 @@
             pointer-events: none;
             animation: float 25s ease-in-out infinite reverse;
         }
+
+        .more-menu-btn {
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+        }
+
+        /* ===== VERTICAL MENU BUTTON ===== */
+        .vertical-menu-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px 12px;
+            color: #1d4ed8;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 101;
+        }
+
+        .vertical-menu-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Vertical Menu Dropdown */
+        .vertical-menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 100;
+            min-width: 180px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .vertical-menu.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vertical-menu a,
+        .vertical-menu button {
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #475569;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 14px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .vertical-menu a:hover,
+        .vertical-menu button:hover {
+            background: #f1f5f9;
+            color: #1d4ed8;
+        }
+
+        .vertical-menu-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 8px 0;
+        }
+
+        /* Dark Mode Toggle in Menu */
+        .menu-dark-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: #475569;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-dark-toggle:hover {
+            background: #f1f5f9;
+            color: #1d4ed8;
+        }
+
+        /* Logout Button */
+        .menu-logout-btn {
+            color: #dc2626;
+        }
+
+        .menu-logout-btn:hover {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+        }
+
+        /* Dark Mode */
+        body.dark-mode .vertical-menu {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .vertical-menu a,
+        body.dark-mode .vertical-menu button {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .vertical-menu a:hover,
+        body.dark-mode .vertical-menu button:hover {
+            background: #334155;
+            color: #60a5fa;
+        }
+
+        body.dark-mode .vertical-menu-divider {
+            background: #475569;
+        }
+
+        body.dark-mode .menu-logout-btn:hover {
+            background: #7f1d1d !important;
+            color: #fca5a5 !important;
+        }
+
 
         @keyframes float {
             0%, 100% {
@@ -1038,7 +1171,13 @@
         }
     </style>
 </head>
+
+
+
+
 <body>
+    
+    
     <!-- Page Loader -->
     <div class="page-loader" id="pageLoader">
         <div class="loader-wrapper">
@@ -1047,8 +1186,8 @@
         </div>
     </div>
 
-    <nav class="navbar">
-        <a href="{% url 'home' %}" class="logo">SkillSync</a>
+    {% comment %} <nav class="navbar">
+        <a href="{% url 'home' %}" class="logo">SkillSync</a> {% endcomment %}
         {% comment %} <form action="{% url 'search' %}" method="get" class="search-form" role="search" aria-label="Search posts">
             <div class="search-input-wrapper">
                 <!-- left inline icon -->
@@ -1087,7 +1226,7 @@
                 <a href="{% url 'about' %}" class="NavtBtn">About</a>
             {% endif %}
         </div> {% endcomment %}
-        <div class="nav-links">
+        {% comment %} <div class="nav-links">
     {% if user.is_authenticated %}
         <a href="{% url 'view_profile' user.username %}" class="profile-link NavtBtn" title="{{ user.username }}">
             <div class="navbar-avatar-wrapper">
@@ -1104,7 +1243,10 @@
             </div>
             <span>{{ user.username }}</span>
         </a>
-        <a href="{% url 'add_content' %}" class="NavtBtn">Create Post</a>
+        <a href="{% url 'add_content' %}" class="NavtBtn">
+            Create Post <i class="fa-regular fa-square-plus"></i> 
+        </a>
+
         <a href="{% url 'about' %}" class="NavtBtn">About</a>
         <a href="{% url 'logout' %}" class="NavtBtn">Logout</a>
     {% else %}
@@ -1113,15 +1255,78 @@
         <a href="{% url 'about' %}" class="NavtBtn">About</a>
     {% endif %}
     <button class="dark-mode-toggle NavtBtn" id="darkModeToggle" title="Toggle dark mode">🌙</button>
-</div>
+</div> {% endcomment %}
 
-        <!-- Hamburger Menu Icon -->
+
+        <nav class="navbar {% if request.resolver_match.url_name == 'landing' %}landing-navbar{% endif %}" style="position: relative;">
+            <a href="{% url 'home' %}" class="logo">SkillSync</a>
+            
+            <!-- Desktop Navigation -->
+            <div class="nav-links">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'view_profile' user.username %}" class="profile-link NavtBtn" title="{{ user.username }}">
+                        <div class="navbar-avatar-wrapper">
+                            {% if user.profile.profile_picture and user.profile.get_profile_picture_url %}
+                                <img src="{{ user.profile.get_profile_picture_url }}" 
+                                    class="navbar-profile-img"
+                                    alt="{{ user.username }}"
+                                    onerror="handleImageError(this)">
+                            {% else %}
+                                <div class="navbar-avatar-fallback" style="position: static; display: flex;">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <span>{{ user.username }}</span>
+                    </a>
+                    <a href="{% url 'add_content' %}" class="NavtBtn">
+                        Create Post <i class="fa-solid fa-square-plus"></i>
+                    </a>
+
+                    <a href="{% url 'about' %}" class="NavtBtn">About</a>
+                {% else %}
+                    {% if request.resolver_match.url_name != 'landing' %}
+                        <a href="{% url 'login' %}" class="NavtBtn">Login</a>
+                        <a href="{% url 'register' %}" class="NavtBtn">Register</a>
+                        <a href="{% url 'about' %}" class="NavtBtn">About</a>
+                    {% endif %}
+                {% endif %}
+                
+                <!-- Go to Home Button (Landing Page Only) -->
+                {% if request.resolver_match.url_name == 'landing' %}
+                    <a href="{% url 'home' %}" class="landing-nav-btn">Go to Home →</a>
+                {% endif %}
+                
+                <!-- Vertical Menu Button (⋮) -->
+                <button class="vertical-menu-btn" id="verticalMenuBtn" onclick="toggleVerticalMenu()">⋮</button>
+            </div>
+
+            <!-- Vertical Menu Dropdown -->
+            <div class="vertical-menu" id="verticalMenu">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="menu-logout-btn">🚪 Logout</a>
+                {% endif %}
+                <div class="vertical-menu-divider"></div>
+                <button class="menu-dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+            </div>
+
+            <!-- Hamburger Menu Icon -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+
+
+
+        {% comment %} <!-- Hamburger Menu Icon -->
         <div class="hamburger" id="hamburger">
             <span></span>
             <span></span>
             <span></span>
         </div>
-    </nav>
+    </nav> {% endcomment %}
 
     <!-- Menu Backdrop -->
     <div class="menu-backdrop" id="menu-backdrop"></div>
@@ -1171,42 +1376,45 @@
             {% endif %}
         </div> {% endcomment %}
         <div class="mobile-menu-content">
-    {% if user.is_authenticated %}
-        <a href="{% url 'view_profile' user.username %}" class="profile-section">
-            <div class="mobile-menu-avatar-wrapper">
-                {% if user.profile.profile_picture and user.profile.get_profile_picture_url %}
-                    <img src="{{ user.profile.get_profile_picture_url }}" 
-                         alt="Profile"
-                         class="mobile-menu-profile-img"
-                         onerror="handleImageError(this)">
-                {% else %}
-                    <div class="mobile-menu-avatar-fallback" style="position: static; display: flex;">
-                        {{ user.username|first|upper }}
+            {% if user.is_authenticated %}
+                <a href="{% url 'view_profile' user.username %}" class="profile-section">
+                    <div class="mobile-menu-avatar-wrapper">
+                        {% if user.profile.profile_picture and user.profile.get_profile_picture_url %}
+                            <img src="{{ user.profile.get_profile_picture_url }}" 
+                                alt="Profile"
+                                class="mobile-menu-profile-img"
+                                onerror="handleImageError(this)">
+                        {% else %}
+                            <div class="mobile-menu-avatar-fallback" style="position: static; display: flex;">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
-            <div class="profile-info">
-                <div class="profile-name">{{ user.username }}</div>
-                <div class="profile-email">View Profile</div>
-            </div>
-        </a>
+                    <div class="profile-info">
+                        <div class="profile-name">{{ user.username }}</div>
+                        <div class="profile-email">View Profile</div>
+                    </div>
+                </a>
 
-        <a href="{% url 'add_content' %}">📝 Create Post</a>
-        <a href="{% url 'about' %}">ℹ️ About</a>
+                <a href="{% url 'add_content' %}" class="NavtBtn">
+                    Create Post <i class="fa-solid fa-square-plus"></i>
+                </a>
 
-        <div class="action-buttons">
-            <a href="{% url 'logout' %}" class="action-btn logout">🚪 Logout</a>
+                <a href="{% url 'about' %}">ℹ️ About</a>
+
+                <div class="action-buttons">
+                    <a href="{% url 'logout' %}" class="action-btn logout">🚪 Logout</a>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}">🔑 Login</a>
+                <a href="{% url 'about' %}">ℹ️ About</a>
+
+                <div class="action-buttons">
+                    <a href="{% url 'login' %}" class="action-btn">Login</a>
+                    <a href="{% url 'register' %}" class="action-btn">Register</a>
+                </div>
+            {% endif %}
         </div>
-    {% else %}
-        <a href="{% url 'login' %}">🔑 Login</a>
-        <a href="{% url 'about' %}">ℹ️ About</a>
-
-        <div class="action-buttons">
-            <a href="{% url 'login' %}" class="action-btn">Login</a>
-            <a href="{% url 'register' %}" class="action-btn">Register</a>
-        </div>
-    {% endif %}
-</div>
 
     </div>
 
@@ -1315,5 +1523,139 @@
             });
         });
     </script>
+
+    {% comment %} <script>
+    <script>
+    (function () {
+        // Selectors/IDs (ensure these IDs are unique in your page)
+        const MORE_BTN_ID = 'moreBtn';
+        const MORE_DROPDOWN_ID = 'moreDropdown';
+        const DARK_TOGGLE_ID = 'darkModeToggle';
+        const DARK_ICON_ID = 'darkModeIcon';
+        const THEME_KEY = 'skillsync-theme';
+
+        // Grab elements safely
+        const moreBtn = document.getElementById(MORE_BTN_ID);
+        const moreDropdown = document.getElementById(MORE_DROPDOWN_ID);
+        const darkToggle = document.getElementById(DARK_TOGGLE_ID);
+        const darkIcon = document.getElementById(DARK_ICON_ID);
+
+        // Debug helper
+        function log(...args) { if (window.console) console.log('[more-dropdown]', ...args); }
+
+        // If any element missing — log and bail gracefully
+        if (!moreBtn) { log('missing element:', MORE_BTN_ID); }
+        if (!moreDropdown) { log('missing element:', MORE_DROPDOWN_ID); }
+        if (!darkToggle) { log('missing element:', DARK_TOGGLE_ID); }
+
+        // Toggle dropdown visibility
+        function toggleDropdown(ev) {
+            ev && ev.stopPropagation();
+            if (!moreDropdown) return;
+            moreDropdown.classList.toggle('show');
+            moreDropdown.setAttribute('aria-hidden', moreDropdown.classList.contains('show') ? 'false' : 'true');
+        }
+
+        // Close dropdown
+        function closeDropdown() {
+            if (!moreDropdown) return;
+            moreDropdown.classList.remove('show');
+            moreDropdown.setAttribute('aria-hidden', 'true');
+        }
+
+        // Apply saved theme at load
+        function applySavedTheme() {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (saved === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (darkIcon) darkIcon.textContent = '☀️';
+            } else {
+                document.body.classList.remove('dark-mode');
+                if (darkIcon) darkIcon.textContent = '🌙';
+            }
+        }
+
+        // Toggle theme function
+        function toggleTheme(ev) {
+            // Prevent click from bubbling to document which closes dropdown
+            ev && ev.stopPropagation();
+
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+
+            localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+
+            if (darkIcon) darkIcon.textContent = isDark ? '☀️' : '🌙';
+
+            // Keep dropdown open or close? We'll keep it open briefly, then close for UX:
+            setTimeout(closeDropdown, 250);
+        }
+
+        // Attach events
+        if (moreBtn) {
+            moreBtn.addEventListener('click', toggleDropdown);
+        }
+
+        // Clicking darkToggle should toggle theme and NOT close dropdown immediately
+        if (darkToggle) {
+            darkToggle.addEventListener('click', toggleTheme);
+            // also prevent the button from causing unintended blur
+            darkToggle.addEventListener('mousedown', (e) => e.preventDefault());
+        }
+
+        // Click outside closes the dropdown
+        document.addEventListener('click', (e) => {
+            if (!moreDropdown) return;
+            if (!moreDropdown.contains(e.target) && !moreBtn.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        // keyboard escape to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDropdown();
+        });
+
+        // Initialize
+        applySavedTheme();
+
+        // For debugging from console:
+        window.__SS_dropdown_debug = {
+            moreBtn, moreDropdown, darkToggle, darkIcon,
+            toggleDropdown, toggleTheme, closeDropdown,
+            currentTheme: () => localStorage.getItem(THEME_KEY)
+        };
+
+        log('more-dropdown initialized');
+    })();
+    </script> {% endcomment %}
+
+
+    <script>
+    function toggleVerticalMenu() {
+        const menu = document.getElementById('verticalMenu');
+        menu.classList.toggle('active');
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('verticalMenu');
+        const btn = document.getElementById('verticalMenuBtn');
+        
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('skillsync-theme', isDarkMode ? 'dark' : 'light');
+        document.getElementById('verticalMenu').classList.remove('active');
+    }
+    </script>
+
+
+
 </body>
 </html>

@@ -1,0 +1,446 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+
+    {% comment %} /* ===========================================
+   MAIN IMAGE (Transparent + Auto Dark/Light Mode)
+=========================================== */
+.main-image {
+   
+    height: auto;
+    display: block;
+    
+     margin: 0 auto;
+
+    mix-blend-mode: multiply;   /* light bg */
+    opacity: 0.95;
+} {% endcomment %}
+{% comment %} 
+body.dark-mode .main-image {
+    mix-blend-mode: screen;     /* dark bg */
+    opacity: 0.90;
+}
+
+
+/* ===========================================
+   CENTER LAYOUT
+=========================================== */
+.center-wrapper {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+} {% endcomment %}
+
+
+/* ===========================================
+   TEXT STYLING
+=========================================== */
+{% comment %} .welcome-title {
+    font-size: 35px;
+    font-weight: 700;
+    color: #e9a811ff;
+    text-align: center;
+    -webkit-text-stroke: 1.5px black; /* Adds a black outline */
+    text-stroke: 1.5px black; /* For some other browsers */
+} {% endcomment %}
+
+{% comment %} .welcome-title {
+    font-size: 35px; /* slightly bigger */
+    font-weight: 800; /* bolder */
+    text-align: center;
+    background: linear-gradient(45deg, #e9d011, #ff6a00); /* gradient effect */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; /* makes gradient visible */
+    -webkit-text-stroke: 2px black; /* black outline */
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6); /* subtle shadow */
+    letter-spacing: 1px; /* gives it a polished look */
+    transition: transform 0.3s ease, text-shadow 0.3s ease; /* hover animation */
+}
+
+.welcome-title:hover {
+    transform: scale(1.1); /* slightly enlarges on hover */
+    text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
+} {% endcomment %}
+
+
+
+{% comment %} .website-info {
+    font-size: 18px;
+    color: #090906ff;
+    font-weight: 500;
+    margin: 40px auto 30px auto;
+    max-width: 650px;
+    text-align: center;
+} {% endcomment %}
+
+{% comment %} 
+.website-info {
+    font-size: 20px; /* slightly bigger */
+    color: #333; /* fallback color */
+    font-weight: 500;
+    margin: 40px auto 30px auto;
+    max-width: 700px; /* slightly wider */
+    text-align: center;
+    line-height: 1.6; /* better readability */
+    letter-spacing: 0.5px; /* subtle spacing */
+    background: linear-gradient(90deg, #f3dc49ff, #6cb929ff, #e74c3c); /* gradient color */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; /* makes gradient visible */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* subtle shadow for depth */
+    transition: transform 0.3s ease, text-shadow 0.3s ease; /* hover effect */
+}
+
+.website-info:hover {
+    transform: scale(1.05); /* slightly enlarge on hover */
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+} {% endcomment %}
+
+
+
+{% comment %} /* ===========================================
+   SEARCH BAR
+=========================================== */
+.search-box {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+}
+
+.search-box input {
+    width: 650px;
+    height: 55px;
+    border-radius: 10px;
+    border: 5px solid #0f0c0cff;;
+    padding: 10px 15px 10px 45px;  /* extra left padding for icon */
+    font-size: 22px;
+
+    background-image: url('https://cdn-icons-png.flaticon.com/512/622/622669.png');
+    background-repeat: no-repeat;
+    background-size: 22px;
+    background-position: 12px center;  /* icon inside input */
+}
+
+
+.search-box button {
+    height: 55px;
+    padding: 0 25px;
+    border: none;
+    background: #375788ff;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    {% comment %} opacity: 0.9; 
+} 
+
+{% comment %} 
+/* ===========================================
+   GO HOME BUTTON
+=========================================== */
+.center-btn {
+    text-align: center;
+    width: 100%;
+}
+
+.go-home-btn {
+    margin-top: 30px;
+    background: white;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    font-weight: 600;
+    display: inline-block;
+} {% endcomment %}
+
+
+{% comment %} /* ===========================================
+   MOBILE RESPONSIVE FIXES
+=========================================== */
+@media (max-width: 768px) {
+
+    .welcome-title {
+        font-size: 28px;
+    }
+
+    .website-info {
+        font-size: 16px;
+        padding: 0 15px;
+    }
+
+    .search-box input {
+        width: 95%;
+        font-size: 18px;
+    }
+
+    .search-box button {
+        width: 95%;
+        margin-top: 10px;
+    }
+
+    .go-home-btn {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+
+    
+
+    
+} {% endcomment %}
+
+/* ===========================================
+   MAIN IMAGE STYLING
+=========================================== */
+.main-image {
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    mix-blend-mode: multiply;   /* better on light backgrounds */
+    opacity: 0.95;
+    transition: transform 0.3s ease;
+}
+
+body.dark-mode .main-image {
+    mix-blend-mode: screen;     /* better on dark backgrounds */
+    opacity: 0.90;
+}
+
+.main-image:hover {
+    transform: scale(1.05); /* subtle zoom on hover */
+}
+
+/* ===========================================
+   CENTER LAYOUT
+=========================================== */
+.center-wrapper {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    
+}
+
+/* ===========================================
+   WELCOME TITLE
+=========================================== */
+.welcome-title {
+    {% comment %} margin-top:90px; {% endcomment %}
+    margin-top: 60px;
+    font-size: 35px;
+    font-weight: 800;
+    text-align: center;
+    background: linear-gradient(45deg, #e9d011, #ff6a00); /* vibrant gradient */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 2px black; /* outline for visibility */
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6); /* subtle shadow */
+    letter-spacing: 1px;
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+.welcome-title:hover {
+    transform: scale(1.1);
+    text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* ===========================================
+   WEBSITE INFO
+=========================================== */
+.website-info {
+    font-size: 20px;
+    color: #333;
+    font-weight: 500;
+    margin: 40px auto 30px auto;
+    max-width: 700px;
+    text-align: center;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    background: linear-gradient(90deg, #f3dc49ff, #6cb929ff, #e74c3c); /* colorful gradient */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+.website-info:hover {
+    transform: scale(1.05);
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ===========================================
+   SEARCH BOX
+=========================================== */
+.search-box {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+}
+
+.search-box input {
+    width: 650px;
+    height: 60px;
+    border-radius: 10px;
+    border: 5px solid #0f0c0cff;
+    padding: 10px 15px 10px 45px;
+    font-size: 22px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/622/622669.png');
+    background-repeat: no-repeat;
+    background-size: 22px;
+    background-position: 12px center;
+    color: #000;
+    transition: all 0.3s ease;
+}
+
+/* Dark mode for search input icon visibility */
+body.dark-mode .search-box input {
+    background-image: url('https://cdn-icons-png.flaticon.com/512/622/622670.png'); /* light/white icon version */
+    background-repeat: no-repeat;
+    background-size: 22px;
+    background-position: 12px center;
+    background-color: #1a1a1a;
+    color: #fff;
+    border-color: #444;
+}
+
+.search-box input:focus {
+    border-color: #ff6a00;
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 106, 0, 0.5);
+}
+
+.search-box button {
+    height: 55px;
+    padding: 0 25px;
+    border: none;
+    background: #444;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.5s ease, transform 0.2s ease;
+    box-shadow: 0 0 10px rgba(255, 106, 0, 0.5);
+    background: linear-gradient(45deg, #e9d011, #ff6a00);
+}
+
+.search-box button:hover {
+    background: #2c456d;
+    transform: scale(1.05);
+}
+
+/* ===========================================
+   GO HOME BUTTON
+=========================================== */
+.center-btn {
+    text-align: center;
+    width: 100%;
+}
+
+.go-home-btn {
+    margin-top: 30px;
+    background: white;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    font-weight: 600;
+    display: inline-block;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.go-home-btn:hover {
+    background: #f3dc49ff;
+    transform: scale(1.05);
+}
+
+/* ===========================================
+   MOBILE RESPONSIVE FIXES
+=========================================== */
+@media (max-width: 768px) {
+
+    .welcome-title {
+        font-size: 28px;
+    }
+
+    .website-info {
+        font-size: 16px;
+        padding: 0 15px;
+    }
+
+    .search-box input {
+        width: 95%;
+        font-size: 18px;
+    }
+
+    .search-box button {
+        width: 95%;
+        margin-top: 10px;
+    }
+
+    .go-home-btn {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+}
+
+
+
+
+
+</style>
+
+
+
+
+<div class="home-container">
+
+    <h1 class="welcome-title">Welcome to SkillSync!</h1>
+    <br>
+    <br>
+
+    <!-- MAIN IMAGE -->
+    <img src="{% static 'images/skillsync.png' %}" class="main-image">
+
+
+{% comment %} 
+    <div class="search-box">
+        <input type="text" placeholder=" Search posts, users, or skills...">
+        <button>Search</button>
+    </div> {% endcomment %}
+
+
+    <!-- WELCOME TITLE -->
+    {% comment %} <h1 class="welcome-title">Welcome to SkillSync!</h1> {% endcomment %}
+
+    <!-- WEBSITE INFO -->
+    <p class="website-info">
+        SkillSync is a vibrant, community-driven platform where you can share knowledge, create and explore content, discover new skills, and connect with like-minded people. Whether you want to learn, teach, collaborate, or simply explore, SkillSync brings everyone together to grow, share, and contribute in one interactive space.
+    </p>
+
+    <!-- SMALL SECOND IMAGE ABOVE SEARCH BAR -->
+    {% comment %} <img src="{% static 'images/skill.webp' %}" class="small-image"> {% endcomment %}
+
+    <!-- SEARCH BAR -->
+    
+
+    <!-- GO TO HOME BUTTON -->
+    {% comment %} <div class="center-btn">
+        <a href="{% url 'home' %}" class="go-home-btn">Go Home</a>
+    </div> {% endcomment %}
+
+
+</div>
+{% endblock %}

@@ -13,6 +13,11 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 
+
+def landing_page(request):
+    return render(request, 'landing.html')
+
+
 def home(request):
     contents = Content.objects.all().order_by('-created_at')
     context = {
