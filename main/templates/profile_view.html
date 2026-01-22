@@ -1,381 +1,738 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static  %}
 
 {% block title %}{{ profile.user.username }} - Profile{% endblock %}
 
 {% block content %}
 <style>
     .profile-container {
-        max-width: 800px;
-        margin: 50px auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 30px;
-        padding: 20px;
+        max-width: 935px;
+        margin: 30px auto;
+        padding: 0 20px;
     }
 
-    .profile-card {
-        width: 100%;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        padding: 30px;
+    /* Instagram-style header */
+    .profile-header {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
+        gap: 80px;
+        padding: 30px 0;
+        margin-bottom: 30px;
     }
 
-    /* Avatar Wrapper */
+    .profile-avatar-section {
+        flex-shrink: 0;
+    }
+
     .profile-avatar-wrapper {
         position: relative;
-        width: 140px;
-        height: 140px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .profile-avatar-img {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #1d4ed8;
-    }
-
-    .profile-avatar-fallback {
-        position: absolute;
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        border: 3px solid #1d4ed8;
-        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-        color: white;
-        font-weight: 700;
-        font-size: 48px;
-        display: none;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .profile-avatar-img.broken ~ .profile-avatar-fallback {
-        display: flex;
-    }
-
-    .profile-card h2 {
-        margin: 0;
-        font-size: 28px;
-        color: #1f2937;
-    }
-
-    .profile-card p {
-        margin: 0;
-        color: #6b7280;
-        font-size: 16px;
-    }
-
-    .profile-card .about {
-        text-align: center;
-        color: #666;
-        font-size: 15px;
-        line-height: 1.6;
-        max-width: 600px;
-    }
-
-    .edit-btn {
-        padding: 10px 24px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-        color: #fff;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
+        width: 150px;
+        height: 150px;
         cursor: pointer;
     }
 
-    .edit-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+    .profile-avatar-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #dbdbdb;
     }
 
-    .user-posts {
-        width: 100%;
+    .profile-avatar-fallback {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        color: white;
+        font-weight: 600;
+        font-size: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dbdbdb;
+    }
+
+    .profile-info-section {
+        flex: 1;
         display: flex;
         flex-direction: column;
         gap: 20px;
     }
 
-    .user-posts h3 {
-        margin-bottom: 10px;
-        border-bottom: 2px solid #1d4ed8;
-        padding-bottom: 10px;
-        color: #1f2937;
-        font-size: 18px;
+    .profile-username-row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
     }
 
-    .post-card {
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    .profile-username {
+        font-size: 20px;
+        font-weight: 300;
+        color: #262626;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 40px;
+    }
+
+    .profile-stat {
+        display: flex;
+        gap: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+    }
+
+    .profile-stat:hover {
+        opacity: 0.7;
+    }
+
+    .profile-stat-number {
+        font-weight: 600;
+        color: #262626;
+    }
+
+    .profile-stat-label {
+        font-weight: 400;
+        color: #262626;
+    }
+
+    .profile-bio {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .profile-fullname {
+        font-weight: 600;
+        font-size: 14px;
+        color: #262626;
+    }
+
+    .profile-about {
+        font-size: 14px;
+        color: #262626;
+        line-height: 1.5;
+        white-space: pre-line;
+    }
+
+    .profile-profession {
+        font-size: 14px;
+        color: #8e8e8e;
+    }
+
+    /* Action Buttons Below Bio */
+    .profile-action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .profile-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
         transition: all 0.3s ease;
     }
 
-    .post-card:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    .profile-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .profile-btn:hover::before {
+        left: 100%;
+    }
+
+    .profile-btn-primary {
+        background: linear-gradient(135deg, #0095f6, #00c3ff);
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 149, 246, 0.3);
+    }
+
+    .profile-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 149, 246, 0.4);
+    }
+
+    .profile-btn-secondary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .profile-btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .profile-btn-follow {
+        background: linear-gradient(135deg, #0095f6, #00c3ff);
+        color: white;
+    }
+
+    .profile-btn-following {
+        background: #efefef;
+        color: #262626;
+    }
+
+    .profile-btn-message {
+        background: #efefef;
+        color: #262626;
+    }
+
+    /* Tabs section */
+    .profile-tabs {
+        border-top: 1px solid #dbdbdb;
+        display: flex;
+        justify-content: center;
+        gap: 60px;
+        margin-bottom: 28px;
+    }
+
+    .profile-tab {
+        padding: 12px 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: #8e8e8e;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-top: 1px solid transparent;
+        margin-top: -1px;
+        text-decoration: none;
+    }
+
+    .profile-tab.active {
+        color: #262626;
+        border-top-color: #262626;
+    }
+
+    /* Posts Column Layout */
+    .posts-column {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+
+    .post-card-full {
+        background: #fff;
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .post-card-full:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         transform: translateY(-2px);
     }
 
-    .post-card h4 {
-        margin: 0 0 10px 0;
-        color: #1f2937;
-    }
-
-    .post-card p {
-        margin: 0 0 10px 0;
-        color: #4b5563;
-    }
-
-    .post-actions {
-        margin-top: 15px;
+    .post-header {
         display: flex;
-        gap: 15px;
         align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #efefef;
     }
 
-    .like-btn {
+    .post-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .post-avatar-fallback {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .post-username {
+        font-weight: 600;
+        font-size: 14px;
+        color: #262626;
+    }
+
+    .post-media-container {
+        width: 100%;
+        max-height: 600px;
+        overflow: hidden;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .post-media {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .post-content {
+        padding: 16px;
+    }
+
+    .post-actions-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .post-action-btn {
         border: none;
         background: none;
         cursor: pointer;
-        font-size: 16px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
         font-weight: 600;
-        color: #6b7280;
-        padding: 6px 12px;
-        border-radius: 6px;
+        color: #262626;
         transition: all 0.2s ease;
     }
 
-    .like-btn:hover {
-        background: rgba(29, 78, 216, 0.08);
-        color: #1d4ed8;
+    .post-action-btn:hover {
+        opacity: 0.7;
+        transform: scale(1.1);
     }
 
-    .like-btn.liked {
-        color: #ef4444;
+    .post-action-btn.liked {
+        color: #ed4956;
     }
 
-    .no-posts {
+    .post-likes {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .post-title {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 4px;
+        color: #262626;
+    }
+
+    .post-description {
+        font-size: 14px;
+        color: #262626;
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+
+    .post-comments-count {
+        color: #8e8e8e;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .post-comments-count:hover {
+        opacity: 0.7;
+    }
+
+    .no-posts-state {
         text-align: center;
-        color: #9ca3af;
-        font-size: 16px;
-        padding: 40px 20px;
+        padding: 60px 20px;
+        border-top: 1px solid #dbdbdb;
     }
 
-    @media (max-width: 768px) {
-        .profile-container {
-            margin: 30px auto;
-        }
-
-        .profile-card {
-            padding: 20px;
-        }
-
-        .profile-card h2 {
-            font-size: 24px;
-        }
-
-        .user-posts h3 {
-            font-size: 16px;
-        }
+    .no-posts-icon {
+        width: 62px;
+        height: 62px;
+        border: 2px solid #262626;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 32px;
     }
 
-    /* ===== DARK MODE STYLES ===== */
-    body.dark-mode .profile-container {
-        background: transparent;
+    .no-posts-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #262626;
+        margin-bottom: 10px;
     }
 
-    body.dark-mode .profile-card {
-        background: #1e293b;
-        color: #e2e8f0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    .no-posts-text {
+        color: #8e8e8e;
+        font-size: 14px;
     }
 
-    body.dark-mode .profile-card:hover {
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    /* Dark Mode */
+    body.dark-mode {
+        background: #000;
+        color: #fafafa;
+    }
+
+    body.dark-mode .profile-username,
+    body.dark-mode .profile-stat-number,
+    body.dark-mode .profile-stat-label,
+    body.dark-mode .profile-fullname,
+    body.dark-mode .profile-about,
+    body.dark-mode .post-username,
+    body.dark-mode .post-title,
+    body.dark-mode .post-description,
+    body.dark-mode .post-likes,
+    body.dark-mode .post-action-btn {
+        color: #fafafa;
+    }
+
+    body.dark-mode .profile-profession,
+    body.dark-mode .profile-tab,
+    body.dark-mode .no-posts-text,
+    body.dark-mode .post-comments-count {
+        color: #a8a8a8;
+    }
+
+    body.dark-mode .profile-tab.active,
+    body.dark-mode .no-posts-title,
+    body.dark-mode .no-posts-icon {
+        color: #fafafa;
+        border-color: #fafafa;
+    }
+
+    body.dark-mode .profile-tabs,
+    body.dark-mode .no-posts-state,
+    body.dark-mode .post-card-full,
+    body.dark-mode .post-header {
+        border-color: #262626;
     }
 
     body.dark-mode .profile-avatar-img {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        border-color: #262626;
     }
 
-    body.dark-mode .profile-avatar-fallback {
-        border-color: #3b82f6;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    body.dark-mode .post-card-full {
+        background: #000;
+        border-color: #262626;
     }
 
-    body.dark-mode .profile-card h2 {
-        color: #e0e7ff;
+    body.dark-mode .profile-btn-message,
+    body.dark-mode .profile-btn-following {
+        background: #262626;
+        color: #fafafa;
     }
 
-    body.dark-mode .profile-card p {
-        color: #cbd5e1;
+    body.dark-mode .profile-btn-message:hover,
+    body.dark-mode .profile-btn-following:hover {
+        background: #363636;
     }
 
-    body.dark-mode .profile-card .about {
-        color: #cbd5e1;
+    body.dark-mode .post-action-btn.liked {
+        color: #ed4956;
     }
 
-    body.dark-mode .edit-btn {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-header {
+            gap: 30px;
+            padding: 20px 0;
+        }
 
-    body.dark-mode .edit-btn:hover {
-        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-    }
+        .profile-avatar-wrapper {
+            width: 77px;
+            height: 77px;
+        }
 
-    body.dark-mode .user-posts h3 {
-        border-bottom-color: #3b82f6;
-        color: #e0e7ff;
-    }
+        .profile-avatar-img,
+        .profile-avatar-fallback {
+            width: 77px;
+            height: 77px;
+            font-size: 24px;
+        }
 
-    body.dark-mode .post-card {
-        background: #1e293b;
-        color: #e2e8f0;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-    }
+        .profile-username {
+            font-size: 18px;
+        }
 
-    body.dark-mode .post-card:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-    }
+        .profile-stats {
+            gap: 20px;
+            font-size: 14px;
+        }
 
-    body.dark-mode .post-card h4 {
-        color: #e0e7ff;
-    }
+        .profile-tabs {
+            gap: 30px;
+        }
 
-    body.dark-mode .post-card p {
-        color: #cbd5e1;
-    }
-
-    body.dark-mode .like-btn {
-        color: #94a3b8;
-    }
-
-    body.dark-mode .like-btn:hover {
-        background: rgba(59, 130, 246, 0.15);
-        color: #60a5fa;
-    }
-
-    body.dark-mode .like-btn.liked {
-        color: #f87171;
-    }
-
-    body.dark-mode .no-posts {
-        color: #64748b;
+        .profile-action-buttons {
+            flex-direction: column;
+        }
     }
 </style>
 
 <div class="profile-container">
-    <!-- Profile Card -->
-    <div class="profile-card">
-        <!-- Profile Picture with Fallback -->
-        <div class="profile-avatar-wrapper">
-            {% if profile.profile_picture and profile.get_profile_picture_url %}
-                <img src="{{ profile.get_profile_picture_url }}" 
-                     alt="Profile Picture"
-                     class="profile-avatar-img"
-                     onerror="handleProfileImageError(this)">
-            {% else %}
-                <div class="profile-avatar-fallback" style="position: static; display: flex;">
-                    {{ profile.user.username|first|upper }}
-                </div>
-            {% endif %}
+    <!-- Profile Header (Instagram Style) -->
+    <div class="profile-header">
+        <!-- Avatar Section -->
+        <div class="profile-avatar-section">
+            <div class="profile-avatar-wrapper">
+                {% if profile.profile_picture and profile.get_profile_picture_url %}
+                    <img src="{{ profile.get_profile_picture_url }}" 
+                         alt="{{ profile.user.username }}"
+                         class="profile-avatar-img"
+                         onerror="handleProfileImageError(this)">
+                {% else %}
+                    <div class="profile-avatar-fallback">
+                        {{ profile.user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
-        <!-- Name and Profession -->
-        <h2>{{ profile.full_name|default:profile.user.username }}</h2>
-        {% if profile.profession %}
-            <p>{{ profile.profession }}</p>
-        {% endif %}
+        <!-- Info Section -->
+        <div class="profile-info-section">
+            <!-- Username -->
+            <div class="profile-username-row">
+                <h2 class="profile-username">{{ profile.user.username }}</h2>
+            </div>
 
-        <!-- About -->
-        {% if profile.about %}
-            <p class="about">{{ profile.about }}</p>
-        {% endif %}
-
-        <!-- Edit Profile Button (only for own profile) -->
-        {% if request.user == profile.user %}
-            <a href="{% url 'edit_profile' %}" class="edit-btn">
-                ✏️ Edit Profile
-            </a>
-        {% endif %}
-    </div>
-
-    <!-- User Posts -->
-    <div class="user-posts">
-        <h3>Posts by {{ profile.full_name|default:profile.user.username }}</h3>
-        
-        {% for content in user_posts %}
-            <div class="post-card">
-                <h4>{{ content.title }}</h4>
-                <p>{{ content.description }}</p>
-
-                {% if content.image %}
-                    <img src="{{ content.image.url }}" alt="Post Image" style="max-width: 100%; height: auto; border-radius: 10px; margin-top: 10px;">
-                {% endif %}
-
-                {% if content.video %}
-                    <video width="100%" controls style="margin-top: 10px; border-radius: 10px;">
-                        <source src="{{ content.video.url }}" type="video/mp4">
-                        Your browser does not support video playback.
-                    </video>
-                {% endif %}
-
-                <div class="post-actions">
-                    <!-- Like Button -->
-                    <form method="POST" action="{% url 'like_content' content.id %}" style="margin: 0;">
-                        {% csrf_token %}
-                        <button type="submit" class="like-btn {% if user in content.likes.all %}liked{% endif %}">
-                            {% if user in content.likes.all %}
-                                ❤️ {{ content.likes.count }}
-                            {% else %}
-                                👍 {{ content.likes.count }}
-                            {% endif %}
-                        </button>
-                    </form>
-
-                    <!-- Comment Count -->
-                    <span style="color: #6b7280; font-weight: 600;">💬 {{ content.comment_set.count }}</span>
-
-                    {% if content.created_by == user %}
-                        <form method="POST"
-                            action="{% url 'delete_content' content.id %}"
-                            style="display:inline;"
-                            onclick="event.stopPropagation();">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="like-btn post-action"
-                                    style="color:#ef4444;"
-                                    onclick="return confirm('Delete this post?');">
-                                🗑️
-                            </button>
-                        </form>
-                        {% endif %}
-
-
+            <!-- Stats -->
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <span class="profile-stat-number">{{ posts_count }}</span>
+                    <span class="profile-stat-label">posts</span>
                 </div>
+                <a href="{% url 'profile_dashboard' username=profile.user.username %}" style="text-decoration: none;">
+                    <div class="profile-stat">
+                        <span class="profile-stat-number">{{ followers_count }}</span>
+                        <span class="profile-stat-label">followers</span>
+                    </div>
+                </a>
+                <a href="{% url 'profile_dashboard' username=profile.user.username %}" style="text-decoration: none;">
+                    <div class="profile-stat">
+                        <span class="profile-stat-number">{{ following_count }}</span>
+                        <span class="profile-stat-label">following</span>
+                    </div>
+                </a>
             </div>
-        {% empty %}
-            <div class="no-posts">
-                <p>📝 No posts yet.</p>
+
+            <!-- Bio -->
+            <div class="profile-bio">
+                {% if profile.full_name %}
+                    <div class="profile-fullname">{{ profile.full_name }}</div>
+                {% endif %}
+                {% if profile.profession %}
+                    <div class="profile-profession">{{ profile.profession }}</div>
+                {% endif %}
+                {% if profile.about %}
+                    <div class="profile-about">{{ profile.about }}</div>
+                {% endif %}
             </div>
-        {% endfor %}
+
+            <!-- Action Buttons (Below Bio) -->
+            <div class="profile-action-buttons">
+                {% if request.user == profile.user %}
+                    <a href="{% url 'edit_profile' %}" class="profile-btn profile-btn-primary">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                        Edit Profile
+                    </a>
+                    <button onclick="shareProfile()" class="profile-btn profile-btn-secondary">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        </svg>
+                        Share Profile
+                    </button>
+                {% else %}
+                    {% if request.user.is_authenticated %}
+                        {% if is_following %}
+                            <form method="POST" action="{% url 'unfollow' profile.user.id %}" style="flex: 1;">
+                                {% csrf_token %}
+                                <button type="submit" class="profile-btn profile-btn-following" style="width: 100%;">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                                    </svg>
+                                    Following
+                                </button>
+                            </form>
+                            <a href="{% url 'chat_room' profile.user.username %}" class="profile-btn profile-btn-message">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                                Message
+                            </a>
+                        {% else %}
+                            <form method="POST" action="{% url 'send_follow_request' profile.user.id %}" style="flex: 1;">
+                                {% csrf_token %}
+                                <button type="submit" class="profile-btn profile-btn-follow" style="width: 100%;">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Follow
+                                </button>
+                            </form>
+                            {% comment %} <a href="{% url 'chat_room' profile.user.username %}"
+                                class="profile-btn profile-btn-message">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                                Message
+                            </a> {% endcomment %}
+
+                            <a href="{% url 'chat_room' profile.user.username %}"
+                                class="profile-btn profile-btn-message">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                                Message
+                            </a>
+
+
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}" class="profile-btn profile-btn-follow">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                            Follow
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
     </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+        <a href="#" class="profile-tab active">
+            <svg aria-label="Posts" fill="currentColor" height="12" viewBox="0 0 24 24" width="12">
+                <rect fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="18" x="3" y="3"></rect>
+                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="9.015" x2="9.015" y1="3" y2="21"></line>
+                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="14.985" x2="14.985" y1="3" y2="21"></line>
+                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="9.015" y2="9.015"></line>
+                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="14.985" y2="14.985"></line>
+            </svg>
+            Posts
+        </a>
+    </div>
+
+    <!-- Posts Column Layout -->
+    {% if user_posts %}
+        <div class="posts-column">
+            {% for content in user_posts %}
+                <div class="post-card-full">
+                    <!-- Post Header -->
+                    <div class="post-header">
+                        {% if profile.profile_picture and profile.get_profile_picture_url %}
+                            <img src="{{ profile.get_profile_picture_url }}" 
+                                 alt="{{ profile.user.username }}"
+                                 class="post-avatar">
+                        {% else %}
+                            <div class="post-avatar-fallback">
+                                {{ profile.user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <span class="post-username">{{ profile.user.username }}</span>
+                    </div>
+
+                    <!-- Post Media -->
+                    {% if content.image %}
+                        <div class="post-media-container">
+                            <img src="{{ content.image.url }}" alt="{{ content.title }}" class="post-media">
+                        </div>
+                    {% elif content.video %}
+                        <div class="post-media-container">
+                            <video controls class="post-media">
+                                <source src="{{ content.video.url }}" type="video/mp4">
+                            </video>
+                        </div>
+                    {% endif %}
+
+                    <!-- Post Content -->
+                    <div class="post-content">
+                        <!-- Actions -->
+                        <div class="post-actions-bar">
+                            <form method="POST" action="{% url 'like_content' content.id %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="post-action-btn {% if user in content.likes.all %}liked{% endif %}">
+                                    {% if user in content.likes.all %}
+                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 48 48">
+                                            <path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+                                        </svg>
+                                    {% else %}
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48">
+                                            <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+                                        </svg>
+                                    {% endif %}
+                                </button>
+                            </form>
+
+                            <button class="post-action-btn">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48">
+                                    <path d="M47.5 46.1l-2.8-11c1.8-3.3 2.8-7.1 2.8-11.1C47.5 11 37 .5 24 .5S.5 11 .5 24 11 47.5 24 47.5c4 0 7.8-1 11.1-2.8l11 2.8c.8.2 1.6-.6 1.4-1.4zm-3-22.1c0 4-1 7-2.6 10-.2.4-.3.9-.2 1.4l2.1 8.4-8.3-2.1c-.5-.1-1-.1-1.4.2-1.8 1-5.2 2.6-10 2.6-11.4 0-20.6-9.2-20.6-20.5S12.7 3.5 24 3.5 44.5 12.7 44.5 24z"></path>
+                                </svg>
+                            </button>
+
+                            {% if content.created_by == user %}
+                                <form method="POST" action="{% url 'delete_content' content.id %}" style="margin: 0; margin-left: auto;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="post-action-btn" style="color:#ed4956;" onclick="return confirm('Delete this post?');">
+                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+
+                        <!-- Likes -->
+                        <div class="post-likes">{{ content.likes.count }} likes</div>
+
+                        <!-- Title & Description -->
+                        <div class="post-title">{{ content.title }}</div>
+                        <div class="post-description">{{ content.description }}</div>
+
+                        <!-- Comments -->
+                        <div class="post-comments-count" onclick="window.location.href='{% url 'content_detail' content.id %}'">
+                            View all {{ content.comment_set.count }} comments
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-posts-state">
+            <div class="no-posts-icon">📷</div>
+            <div class="no-posts-title">No Posts Yet</div>
+            <div class="no-posts-text">When {{ profile.user.username }} posts, you'll see their photos and videos here.</div>
+        </div>
+    {% endif %}
 </div>
 
 <script>
@@ -383,23 +740,18 @@
         const wrapper = img.closest('.profile-avatar-wrapper');
         if (wrapper) {
             img.style.display = 'none';
-            img.classList.add('broken');
-            let fallback = wrapper.querySelector('.profile-avatar-fallback');
-            if (fallback) {
-                fallback.style.display = 'flex';
-            }
+            const fallback = document.createElement('div');
+            fallback.className = 'profile-avatar-fallback';
+            fallback.textContent = '{{ profile.user.username|first|upper }}';
+            wrapper.appendChild(fallback);
         }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.profile-avatar-img').forEach(img => {
-            if (img.complete && img.naturalHeight === 0) {
-                handleProfileImageError(img);
-            }
-            img.addEventListener('error', function() {
-                handleProfileImageError(this);
-            });
-        });
+        const profileImg = document.querySelector('.profile-avatar-img');
+        if (profileImg && profileImg.complete && profileImg.naturalHeight === 0) {
+            handleProfileImageError(profileImg);
+        }
     });
 </script>
 

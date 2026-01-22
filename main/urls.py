@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import delete_comment, delete_content
+from .views import chat_room, delete_comment, delete_content
 
 urlpatterns = [
     path('', views.landing_page, name='landing'),
@@ -22,4 +22,19 @@ urlpatterns = [
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('verify-otp/<int:user_id>/', views.verify_otp, name='verify_otp'),
     path('reset-password/<int:user_id>/', views.reset_password, name='reset_password'),
+
+
+    path('profile/<int:user_id>/',views.profile,name='profile'),
+    path('follow/<int:user_id>/',views.send_follow_request,name='send_follow_request'),
+    path('accept/<int:request_id>/',views.accept_request, name='accept_request'),
+    path('reject/<int:request_id>/',views.reject_request, name='reject_request'),
+
+    path('profile/<str:username>/dashboard/', views.profile_dashboard, name='profile_dashboard'),
+    path('unfollow/<int:user_id>/', views.unfollow, name='unfollow'),
+    path('chats/', views.chat_list, name='chat_list'),
+    path('chat/<str:username>/', chat_room, name='chat_room'),
+    path('start-chat/<int:user_id>/', views.start_chat, name='start_chat'),
+    path('chats/<int:room_id>/', views.chat_detail, name='chat_detail'),
+    
+
 ]

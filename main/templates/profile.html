@@ -1,0 +1,13 @@
+
+{% load follow_tags %}
+{% if is_following %}
+  <button disabled>Following</button>
+
+{% elif is_requested %}
+  <button disabled>Requested</button>
+
+{% else %}
+  <a href="{% url 'send_follow_request' profile_user.id %}">
+    Follow
+  </a>
+{% endif %}

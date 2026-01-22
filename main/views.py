@@ -11,6 +11,25 @@ import json
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
+from .models import FollowRequest,Follow
+from django.core.paginator import Paginator
+from django.urls import reverse
+
+
+from django.contrib.auth.decorators import login_required  
+from main.models import Follow, FollowRequest
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .models import ChatRoom, Message
+from django.db.models import Q
+# from .models import ChatRoom
+
+# from .views import chat_list, chat_room
+
+
+
+
+
 
 
 
@@ -20,9 +39,16 @@ def landing_page(request):
 
 def home(request):
     contents = Content.objects.all().order_by('-created_at')
+    sent_requests = []
+    following = []
+    if request.user.is_authenticated:
+        sent_requests = list(FollowRequest.objects.filter(sender=request.user).values_list('receiver_id', flat=True))
+        following = list(Follow.objects.filter(follower=request.user).values_list('following_id', flat=True))
     context = {
         'contents': contents,
-        'default_avatar': True
+        'default_avatar': True,
+        'sent_requests': sent_requests,
+        'following': following,
     }
     return render(request, 'home.html', context)
 
@@ -124,13 +150,64 @@ def logout_user(request):
     logout(request)
     return redirect('login')
 
-@login_required
+# def view_profile(request, username):
+#     profile = get_object_or_404(Profile, user__username=username)
+
+#     # whether the current viewer follows this profile.user
+#     is_following = False
+#     if request.user.is_authenticated:
+#         is_following = Follow.objects.filter(
+#             follower=request.user,
+#             following=profile.user
+#         ).exists()
+
+#     user_posts = Content.objects.filter(created_by=profile.user).order_by('-created_at')
+
+#     # counts for UI (posts, followers, following)
+#     posts_count = user_posts.count()
+#     followers_count = Follow.objects.filter(following=profile.user).count()
+#     following_count = Follow.objects.filter(follower=profile.user).count()
+
+#     return render(request, 'profile_view.html', {
+#         'profile': profile,
+#         'user_posts': user_posts,
+#         'is_following': is_following,
+#         'posts_count': posts_count,
+#         'followers_count': followers_count,
+#         'following_count': following_count,
+#         'profile_url': request.build_absolute_uri(reverse('view_profile', args=[profile.user.username])),
+#     })
+
+
+
 def view_profile(request, username):
-    user = get_object_or_404(User, username=username)
-    profile, created = Profile.objects.get_or_create(user=user)
-    user_posts = Content.objects.filter(created_by=user).order_by('-created_at')
-    context = {'profile': profile, 'user_posts': user_posts}
-    return render(request, 'profile_view.html', context)
+    user_obj = get_object_or_404(User, username=username)
+    profile, created = Profile.objects.get_or_create(user=user_obj)
+
+    # whether the current viewer follows this profile.user
+    is_following = False
+    if request.user.is_authenticated:
+        is_following = Follow.objects.filter(
+            follower=request.user,
+            following=profile.user
+        ).exists()
+
+    user_posts = Content.objects.filter(created_by=profile.user).order_by('-created_at')
+
+    # counts for UI
+    posts_count = user_posts.count()
+    followers_count = Follow.objects.filter(following=profile.user).count()
+    following_count = Follow.objects.filter(follower=profile.user).count()
+
+    return render(request, 'profile_view.html', {
+        'profile': profile,
+        'user_posts': user_posts,
+        'is_following': is_following,
+        'posts_count': posts_count,
+        'followers_count': followers_count,
+        'following_count': following_count,
+    })
+
 
 @login_required
 def edit_profile(request):
@@ -513,3 +590,206 @@ def send_registration_welcome_email(user, recipient_email):
     except Exception as e:
         print(f"Error sending registration welcome email: {str(e)}")
         return False
+    
+
+
+
+
+
+# changeeeeeehggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggd
+
+def profile(request, user_id):
+    """
+    Public profile by numeric id — safe for anonymous visitors.
+    """
+    profile_user = get_object_or_404(User, id=user_id)
+
+    is_following = False
+    is_requested = False
+
+    # Only perform follow/request checks for authenticated users
+    if request.user.is_authenticated:
+        is_following = Follow.objects.filter(
+            follower=request.user,
+            following=profile_user
+        ).exists()
+
+        is_requested = FollowRequest.objects.filter(
+            sender=request.user,
+            receiver=profile_user
+        ).exists()
+
+    return render(request, 'profile.html', {
+        'profile_user': profile_user,
+        'is_following': is_following,
+        'is_requested': is_requested
+    })
+
+
+@login_required
+def send_follow_request(request, user_id):
+    """
+    Create an immediate follow relationship (or noop if already following).
+
+    Historically this created a FollowRequest (approval flow). Many users
+    expect following to be immediate. This view now creates a `Follow`
+    record so the UI updates instantly. It supports both POST and GET for
+    convenience, but POST is preferred from forms.
+    """
+    receiver = get_object_or_404(User, id=user_id)
+
+    # Prevent following yourself
+    if request.user == receiver:
+        return redirect('view_profile', username=receiver.username)
+
+    # Create the follow relationship if it doesn't exist
+    Follow.objects.get_or_create(follower=request.user, following=receiver)
+
+    # If there was an existing follow request (approval flow), remove it
+    FollowRequest.objects.filter(sender=request.user, receiver=receiver).delete()
+
+    return redirect('view_profile', username=receiver.username)
+
+
+@login_required
+def accept_request(request,request_id):
+    follow_request=get_object_or_404(FollowRequest,id=request_id)
+
+    if follow_request.receiver==request.user:
+        Follow.objects.get_or_create(
+            follower=follow_request.sender,
+            following=follow_request.receiver
+        )
+        follow_request.delete()
+    return redirect('home')
+
+@login_required
+def reject_request(request,request_id):
+    follow_request=get_object_or_404(FollowRequest,id=request_id)
+
+    if follow_request.receiver==request.user:
+        follow_request.delete()
+    return redirect('home')
+
+
+
+
+
+
+@login_required
+def unfollow(request, user_id):
+    """
+    Remove a follow relationship where request.user is the follower and user_id is the following.
+    """
+    target = get_object_or_404(User, id=user_id)
+    Follow.objects.filter(follower=request.user, following=target).delete()
+    # Redirect back to the profile page (username route)
+    return redirect('view_profile', username=target.username)
+
+
+def profile_dashboard(request, username):
+    """
+    Dashboard page for a user's profile showing followers and following lists.
+    Publicly viewable; follow/unfollow actions require login.
+    """
+    profile_user = get_object_or_404(User, username=username)
+
+    # Followers: people who follow profile_user
+    followers_qs = Follow.objects.filter(following=profile_user).select_related('follower').order_by('-id')
+    followers_count = followers_qs.count()
+
+    # Following: people that profile_user follows
+    following_qs = Follow.objects.filter(follower=profile_user).select_related('following').order_by('-id')
+    following_count = following_qs.count()
+
+    # For fast lookup whether current viewer follows profile_user
+    viewer_follows = False
+    viewer_following_ids = set()
+    if request.user.is_authenticated:
+        viewer_follows = Follow.objects.filter(follower=request.user, following=profile_user).exists()
+        # precompute ids to optimize template checks
+        viewer_following_ids = set(Follow.objects.filter(follower=request.user).values_list('following_id', flat=True))
+
+    # Pagination
+    followers_page_number = request.GET.get('followers_page', 1)
+    following_page_number = request.GET.get('following_page', 1)
+    followers_paginator = Paginator(followers_qs, 12)
+    following_paginator = Paginator(following_qs, 12)
+
+    followers_page = followers_paginator.get_page(followers_page_number)
+    following_page = following_paginator.get_page(following_page_number)
+
+    context = {
+        'profile_user': profile_user,
+        'followers_page': followers_page,
+        'following_page': following_page,
+        'followers_count': followers_count,
+        'following_count': following_count,
+        'viewer_follows': viewer_follows,
+        'viewer_following_ids': viewer_following_ids,
+    }
+    return render(request, 'profile_dashboard.html', context)
+
+
+@login_required
+def start_chat(request, user_id):
+    other_user = get_object_or_404(User, id=user_id)
+    # Check if chat already exists
+    chat = ChatRoom.objects.filter(
+        (Q(user1=request.user) & Q(user2=other_user)) |
+        (Q(user1=other_user) & Q(user2=request.user))
+    ).first()
+    if not chat:
+        chat = ChatRoom.objects.create(user1=request.user, user2=other_user)
+    return redirect('chat_detail', room_id=chat.id)
+
+@login_required
+def chat_list(request):
+    rooms = ChatRoom.objects.filter(
+        Q(user1=request.user) | Q(user2=request.user)
+    ).order_by('-created_at')
+
+    return render(request, 'chat_list.html', {'rooms': rooms})
+
+
+@login_required
+def chat_room(request, username):
+    other_user = get_object_or_404(User, username=username)
+
+    room, created = ChatRoom.objects.get_or_create(
+        user1=min(request.user, other_user, key=lambda u: u.id),
+        user2=max(request.user, other_user, key=lambda u: u.id)
+    )
+
+    if request.method == 'POST':
+        text = request.POST.get('message')
+        if text:
+            Message.objects.create(
+                room=room,
+                sender=request.user,
+                text=text
+            )
+        return redirect('chat_room', username=other_user.username)
+
+    messages = room.messages.all().order_by('timestamp')
+    return render(request, 'chat_room.html', {
+        'room': room,
+        'messages': messages,
+        'other_user': other_user
+    })
+
+
+@login_required
+def chat_detail(request, room_id):
+    chat = get_object_or_404(ChatRoom, id=room_id)
+    if request.user not in [chat.user1, chat.user2]:
+        return redirect('chat_list')
+
+    if request.method == 'POST':
+        text = request.POST.get('message')
+        if text:
+            Message.objects.create(room=chat, sender=request.user, text=text)
+            return redirect('chat_detail', room_id=chat.id)
+
+    messages = chat.messages.all().order_by('timestamp')
+    return render(request, 'chat_detail.html', {'chat': chat, 'messages': messages})

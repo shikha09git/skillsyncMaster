@@ -120,6 +120,36 @@ form button:hover {
     background: #2563eb;
 }
 
+/* Follow button: transparent outline variant used across the site */
+.follow-btn, button.follow-btn, a.follow-btn, span.follow-btn, input.follow-btn, input[type="submit"].follow-btn {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    padding: 6px 12px !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    vertical-align: middle !important;
+}
+.follow-btn:hover, button.follow-btn:hover, a.follow-btn:hover, span.follow-btn:hover {
+    background: rgba(255,255,255,0.04) !important;
+    transform: translateY(-2px);
+}
+
+/* Light mode: use subtle blue outline so button remains visible */
+body:not(.dark-mode) .follow-btn {
+    color: #1d4ed8 !important;
+    border-color: rgba(29,78,216,0.12) !important;
+}
+
 /* Alerts */
 .alert {
     padding: 10px 15px;

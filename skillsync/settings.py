@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
+    'channels',
     'django.contrib.humanize',
 ]
 
@@ -48,6 +49,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'skillsync.wsgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 DATABASES = {
     'default': dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")

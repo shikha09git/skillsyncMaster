@@ -435,6 +435,12 @@
         box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
     }
 
+        /* Post header right meta (date + follow button) */
+        .post-meta-right {
+            display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width:110px;
+        }
+        .post-meta-right .post-time { color:#9ca3af; font-size:13px; }
+
     body.dark-mode .modal {
         background: rgba(0, 0, 0, 0.7);
     }
@@ -673,6 +679,54 @@ body.dark-mode .search-icon {
 {% comment %} ######################################################################################################## {% endcomment %}
 
 
+{% if user.is_authenticated and follow_requests %}
+<div style="
+    max-width:900px;
+    margin:20px auto 30px;
+    padding:16px 20px;
+    background:#f8fafc;
+    border-radius:14px;
+    border:1px solid #e5e7eb;
+">
+    <h3 style="font-size:18px;font-weight:800;margin-bottom:16px;color:#1f2937;">
+        👥 Follow Requests
+    </h3>
+
+    {% for req in follow_requests %}
+        <div style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:10px 0;
+            border-bottom:1px solid #e5e7eb;
+        ">
+            <div style="font-weight:700;">
+                {{ req.sender.username }}
+            </div>
+
+            <div style="display:flex;gap:10px;">
+                <a href="{% url 'accept_request' req.id %}"
+                   style="padding:6px 14px;background:#16a34a;color:white;border-radius:8px;font-weight:600;text-decoration:none;">
+                    Accept
+                </a>
+
+                <a href="{% url 'reject_request' req.id %}"
+                   style="padding:6px 14px;background:#dc2626;color:white;border-radius:8px;font-weight:600;text-decoration:none;">
+                    Reject
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+
+
+{% comment %} ######################################################################################################## {% endcomment %}
+
+
+
 
 <div class="search-bar-container">
     <form action="{% url 'search' %}" method="get" class="search-form" role="search" aria-label="Search posts">
@@ -711,14 +765,35 @@ body.dark-mode .search-icon {
                             {% endif %}
                         </a>
                     </div>
+
                     <div class="user-info">
                         <a href="{% url 'view_profile' content.created_by.username %}" style="text-decoration: none;" onclick="event.stopPropagation();">
                             <div class="user-name">{{ content.created_by.profile.full_name|default:content.created_by.username }}</div>
                         </a>
                         <div class="user-handle">@{{ content.created_by.username }}</div>
                     </div>
-                    <div class="post-time">{{ content.created_at|date:"M d" }}</div>
+
+                    <div class="post-meta-right">
+                        <div class="post-time">{{ content.created_at|date:"M d" }}</div>
+
+                        {% if user.is_authenticated and user != content.created_by %}
+                            {% if content.created_by.id in following %}
+                                <form method="POST" action="{% url 'unfollow' content.created_by.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="follow-btn">Unfollow</button>
+                                </form>
+                            {% elif content.created_by.id in sent_requests %}
+                                <span class="follow-btn" style="border-color: rgba(245,158,11,0.12); color:#f59e0b; background: transparent;">Requested</span>
+                            {% else %}
+                                <form method="POST" action="{% url 'send_follow_request' content.created_by.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="follow-btn">Follow</button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
+{% comment %} ########################################################################################################################### {% endcomment %}
 
                 <!-- Post Content -->
                 <div class="post-content">
