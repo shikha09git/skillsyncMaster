@@ -1,4 +1,5 @@
-{% comment %} {% extends "base.html" %}
+
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}{{ profile_user.username }} — Dashboard{% endblock %}
@@ -37,8 +38,12 @@
     </div>
   </div>
 
+  <div style="margin-bottom:24px;display:flex;gap:16px;">
+    <a href="#followers" onclick="showTab('followers')" id="followersTab" style="padding:8px 24px;border-radius:8px;background:#f1f5f9;color:#1d4ed8;font-weight:600;text-decoration:none;cursor:pointer;">Followers</a>
+    <a href="#following" onclick="showTab('following')" id="followingTab" style="padding:8px 24px;border-radius:8px;background:#f1f5f9;color:#1d4ed8;font-weight:600;text-decoration:none;cursor:pointer;">Following</a>
+  </div>
   <div style="display:flex;gap:24px;flex-wrap:wrap;">
-    <div style="flex:1;min-width:320px;">
+    <div id="followersSection" style="flex:1;min-width:320px;">
       <h3 style="margin-bottom:12px;">Followers</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
         {% for rel in followers_page %}
@@ -87,9 +92,21 @@
       {% endif %}
     </div>
 
-    <div style="flex:1;min-width:320px;">
+    <div id="followingSection" style="flex:1;min-width:320px;display:none;">
       <h3 style="margin-bottom:12px;">Following</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+        <script>
+        function showTab(tab) {
+          document.getElementById('followersSection').style.display = tab === 'followers' ? '' : 'none';
+          document.getElementById('followingSection').style.display = tab === 'following' ? '' : 'none';
+          document.getElementById('followersTab').style.background = tab === 'followers' ? '#1d4ed8' : '#f1f5f9';
+          document.getElementById('followersTab').style.color = tab === 'followers' ? '#fff' : '#1d4ed8';
+          document.getElementById('followingTab').style.background = tab === 'following' ? '#1d4ed8' : '#f1f5f9';
+          document.getElementById('followingTab').style.color = tab === 'following' ? '#fff' : '#1d4ed8';
+        }
+        // Default to followers tab
+        showTab('followers');
+        </script>
         {% for rel in following_page %}
           <div style="padding:12px;background:#fff;border-radius:10px;border:1px solid #f0f4f8;display:flex;align-items:center;gap:12px;">
             <a href="{% url 'view_profile' rel.following.username %}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
@@ -136,27 +153,13 @@
       {% endif %}
     </div>
   </div>
-</div>
-{% endblock %} {% endcomment %}
+
+{% endblock %}
 
 
 
 
-
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}{{ profile_user.username }} — Dashboard{% endblock %}
-
-{% block content %}
-<style>
-  .see-more-btn {
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
+*** End Patch
     font-weight: 600;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -613,4 +616,3 @@
     </div>
   </div>
 </div>
-{% endblock %}

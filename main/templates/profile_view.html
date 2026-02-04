@@ -735,7 +735,24 @@
     {% endif %}
 </div>
 
+
 <script>
+    function shareProfile() {
+        const url = window.location.href;
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                url: url
+            });
+        } else {
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Profile link copied to clipboard!');
+            }, function() {
+                alert('Could not copy link. Please copy manually.');
+            });
+        }
+    }
+
     function handleProfileImageError(img) {
         const wrapper = img.closest('.profile-avatar-wrapper');
         if (wrapper) {

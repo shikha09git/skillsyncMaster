@@ -17,7 +17,7 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
     
-    # ✅ ADD THIS METHOD - This is CRUCIAL
+    #  ADD THIS METHOD - This is CRUCIAL
     def get_profile_picture_url(self):
         '''Returns profile picture URL if file exists, otherwise None'''
         if self.profile_picture:
@@ -60,7 +60,7 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.content.title}"
 
-# 🔹 Automatically create a profile for each new user
+#  Automatically create a profile for each new user
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
