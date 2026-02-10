@@ -15,7 +15,6 @@
        ===================================================== */
     .landing-page {
         background: var(--bg-secondary);
-        min-height: 100vh;
     }
 
     .gradient-text {
@@ -31,6 +30,13 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+    }
+
+    .section-title {
+        font-size: 32px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 48px;
     }
 
     /* =====================================================
@@ -51,23 +57,12 @@
     .landing-logo {
         font-size: 24px;
         font-weight: 800;
-        text-decoration: none;
     }
 
     .landing-nav-links {
         display: flex;
-        gap: 20px;
+        gap: 24px;
         align-items: center;
-    }
-
-    .theme-toggle {
-        border: 1px solid var(--border-color);
-        background: var(--bg-secondary);
-        color: var(--text-primary);
-        padding: 6px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
     }
 
     /* =====================================================
@@ -76,9 +71,11 @@
     .landing-hero {
         display: flex;
         align-items: center;
-        justify-content: center;
-        padding: 100px 40px;
-        text-align: center;
+        justify-content: space-between;
+        gap: 60px;
+        padding: 80px 40px;
+        max-width: 1200px;
+        margin: auto;
     }
 
     .hero-title {
@@ -96,15 +93,44 @@
     .hero-buttons {
         display: flex;
         gap: 16px;
-        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    /* =====================================================
+       Features
+       ===================================================== */
+    .landing-features {
+        padding: 80px 40px;
+        background: var(--bg-primary);
+    }
+
+    .features-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    /* =====================================================
+       Footer
+       ===================================================== */
+    .landing-footer {
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border-color);
+        padding: 60px 40px 30px;
     }
 
     /* =====================================================
        Responsive
        ===================================================== */
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 36px;
+    @media (max-width: 900px) {
+        .landing-hero {
+            flex-direction: column;
+            text-align: center;
+        }
+        .features-row {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -119,9 +145,7 @@
         <a href="{% url 'landing' %}" class="landing-logo">
             <span class="gradient-text">SkillSync</span>
         </a>
-
         <div class="landing-nav-links">
-            <button id="themeToggle" class="theme-toggle" title="Toggle theme">🌙</button>
             <a href="{% url 'about' %}">About</a>
             <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">Login</a>
             <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Sign Up</a>
@@ -135,11 +159,9 @@
                 Share Your <span class="gradient-text">Skills</span><br>
                 Grow Your <span class="gradient-text">Network</span>
             </h1>
-
             <p class="hero-subtitle">
                 Join a community of learners and creators.
             </p>
-
             <div class="hero-buttons">
                 <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Get Started</a>
                 <a href="{% url 'about' %}" class="btn btn-outline btn-lg">Learn More</a>
@@ -148,27 +170,5 @@
     </section>
 
 </div>
-
-<!-- THEME TOGGLE SCRIPT -->
-<script>
-    const toggleBtn = document.getElementById('themeToggle');
-    const body = document.body;
-
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-        toggleBtn.textContent = '☀️';
-    } else {
-        toggleBtn.textContent = '🌙';
-    }
-
-    toggleBtn.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        const isDark = body.classList.contains('dark-mode');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        toggleBtn.textContent = isDark ? '☀️' : '🌙';
-    });
-</script>
 
 {% endblock %}
