@@ -9,272 +9,24 @@
     .sidebar { display: none !important; }
     .main-content { margin-left: 0 !important; }
     .bottom-nav { display: none !important; }
-</style>
-{% endblock %}
 
-{% block content %}
-
-<div class="landing-page">
-    
-    <!-- ================================================================
-         NAVBAR
-         ================================================================ -->
-    <nav class="landing-nav">
-        <a href="{% url 'landing' %}" class="landing-logo">
-            <span class="gradient-text">SkillSync</span>
-        </a>
-        <div class="landing-nav-links">
-            <a href="{% url 'about' %}">About</a>
-            <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Sign Up</a>
-        </div>
-    </nav>
-
-    <!-- ================================================================
-         HERO SECTION
-         ================================================================ -->
-    <section class="landing-hero">
-        <div class="hero-content">
-            <h1 class="hero-title">
-                Share Your <span class="gradient-text">Skills</span>,<br>
-                Grow Your <span class="gradient-text">Network</span>
-            </h1>
-            <p class="hero-subtitle">
-                Join a community of learners, creators, and professionals sharing knowledge and building connections.
-            </p>
-            <div class="hero-buttons">
-                <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
-                    <i class="fa-solid fa-rocket"></i> Get Started Free
-                </a>
-                <a href="{% url 'about' %}" class="btn btn-outline btn-lg">
-                    Learn More
-                </a>
-            </div>
-            <p class="hero-note">
-                <i class="fa-solid fa-check-circle"></i> No credit card required
-            </p>
-        </div>
-        
-        <div class="hero-image">
-            <div class="hero-mockup">
-                <div class="mockup-header">
-                    <span class="dot red"></span>
-                    <span class="dot yellow"></span>
-                    <span class="dot green"></span>
-                </div>
-                <div class="mockup-content">
-                    <div class="mockup-post">
-                        <div class="mockup-avatar"></div>
-                        <div class="mockup-lines">
-                            <div class="line short"></div>
-                            <div class="line long"></div>
-                        </div>
-                    </div>
-                    <div class="mockup-image"></div>
-                    <div class="mockup-actions">
-                        <i class="fa-solid fa-heart"></i>
-                        <i class="fa-solid fa-comment"></i>
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================================================================
-         FEATURES SECTION
-         ================================================================ -->
-    <section class="landing-features">
-        <h2 class="section-title">Why SkillSync?</h2>
-        
-        <div class="features-row">
-            <div class="feature-item">
-                <div class="feature-icon-wrapper">
-                    <i class="fa-solid fa-share-nodes"></i>
-                </div>
-                <h3>Share & Discover</h3>
-                <p>Post images, videos, PDFs, and more. Discover content from creators worldwide.</p>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-icon-wrapper">
-                    <i class="fa-solid fa-user-group"></i>
-                </div>
-                <h3>Build Community</h3>
-                <p>Follow your favorite creators, engage with content, and grow your network.</p>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-icon-wrapper">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-                <h3>Real-time Chat</h3>
-                <p>Connect instantly with direct messaging and collaborate on ideas.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================================================================
-         HOW IT WORKS
-         ================================================================ -->
-    <section class="landing-how-it-works">
-        <h2 class="section-title">How It Works</h2>
-        
-        <div class="steps-container">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Create Account</h3>
-                <p>Sign up in seconds with just your email</p>
-            </div>
-            <div class="step-arrow">
-                <i class="fa-solid fa-arrow-right"></i>
-            </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Share Content</h3>
-                <p>Post your knowledge, tutorials, or ideas</p>
-            </div>
-            <div class="step-arrow">
-                <i class="fa-solid fa-arrow-right"></i>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Connect & Grow</h3>
-                <p>Build your audience and learn from others</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================================================================
-         TESTIMONIALS (Optional)
-         ================================================================ -->
-    <section class="landing-testimonials">
-        <h2 class="section-title">What People Say</h2>
-        
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <div class="testimonial-stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                </div>
-                <p>"SkillSync has been amazing for sharing my coding tutorials. The community is super supportive!"</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">A</div>
-                    <div class="author-info">
-                        <strong>Alex Chen</strong>
-                        <span>Software Developer</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="testimonial-card">
-                <div class="testimonial-stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                </div>
-                <p>"I love how easy it is to discover new content and connect with like-minded learners."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">S</div>
-                    <div class="author-info">
-                        <strong>Sarah Miller</strong>
-                        <span>UX Designer</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="testimonial-card">
-                <div class="testimonial-stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                </div>
-                <p>"The real-time chat feature makes collaboration so much easier. Highly recommend!"</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">M</div>
-                    <div class="author-info">
-                        <strong>Mike Johnson</strong>
-                        <span>Student</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================================================================
-         CTA SECTION
-         ================================================================ -->
-    <section class="landing-cta">
-        <div class="cta-content">
-            <h2>Ready to Join?</h2>
-            <p>Start sharing and learning with thousands of others today.</p>
-            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
-                <i class="fa-solid fa-user-plus"></i> Create Free Account
-            </a>
-        </div>
-    </section>
-
-    <!-- ================================================================
-         FOOTER
-         ================================================================ -->
-    <footer class="landing-footer">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <span class="gradient-text">SkillSync</span>
-                <p>Connect. Learn. Grow Together.</p>
-            </div>
-            <div class="footer-links-grid">
-                <div class="footer-column">
-                    <h4>Product</h4>
-                    <a href="{% url 'about' %}">About</a>
-                    <a href="#">Features</a>
-                    <a href="#">Pricing</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Support</h4>
-                    <a href="#">Help Center</a>
-                    <a href="#">Contact</a>
-                    <a href="#">FAQ</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Legal</h4>
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Cookies</a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2025 SkillSync. All rights reserved.</p>
-            <div class="social-links">
-                <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="#"><i class="fa-brands fa-github"></i></a>
-            </div>
-        </div>
-    </footer>
-
-</div>
-
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* Landing Page Base */
+    /* =====================================================
+       Landing Page Base
+       ===================================================== */
     .landing-page {
         background: var(--bg-secondary);
     }
 
     .gradient-text {
-        background: linear-gradient(135deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+        background: linear-gradient(
+            135deg,
+            #405DE6,
+            #5851DB,
+            #833AB4,
+            #C13584,
+            #E1306C,
+            #FD1D1D
+        );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -287,7 +39,9 @@
         margin-bottom: 48px;
     }
 
-    /* Landing Nav */
+    /* =====================================================
+       Navbar
+       ===================================================== */
     .landing-nav {
         display: flex;
         justify-content: space-between;
@@ -307,16 +61,13 @@
 
     .landing-nav-links {
         display: flex;
-        align-items: center;
         gap: 24px;
+        align-items: center;
     }
 
-    .landing-nav-links a {
-        color: var(--text-primary);
-        font-weight: 500;
-    }
-
-    /* Hero Section */
+    /* =====================================================
+       Hero Section
+       ===================================================== */
     .landing-hero {
         display: flex;
         align-items: center;
@@ -324,25 +75,18 @@
         gap: 60px;
         padding: 80px 40px;
         max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .hero-content {
-        flex: 1;
-        max-width: 550px;
+        margin: auto;
     }
 
     .hero-title {
         font-size: 48px;
         font-weight: 800;
-        line-height: 1.2;
         margin-bottom: 24px;
     }
 
     .hero-subtitle {
         font-size: 18px;
         color: var(--text-secondary);
-        line-height: 1.6;
         margin-bottom: 32px;
     }
 
@@ -352,98 +96,9 @@
         margin-bottom: 16px;
     }
 
-    .hero-note {
-        font-size: 14px;
-        color: var(--text-tertiary);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .hero-note i {
-        color: var(--success);
-    }
-
-    /* Hero Mockup */
-    .hero-image {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-    }
-
-    .hero-mockup {
-        width: 320px;
-        background: var(--bg-primary);
-        border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-xl);
-        overflow: hidden;
-        border: 1px solid var(--border-color);
-    }
-
-    .mockup-header {
-        display: flex;
-        gap: 8px;
-        padding: 12px 16px;
-        background: var(--bg-tertiary);
-    }
-
-    .dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
-
-    .dot.red { background: #ff5f57; }
-    .dot.yellow { background: #febc2e; }
-    .dot.green { background: #28c840; }
-
-    .mockup-content {
-        padding: 16px;
-    }
-
-    .mockup-post {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 16px;
-    }
-
-    .mockup-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #405DE6, #833AB4);
-    }
-
-    .mockup-lines {
-        flex: 1;
-    }
-
-    .line {
-        height: 10px;
-        background: var(--bg-tertiary);
-        border-radius: 4px;
-        margin-bottom: 8px;
-    }
-
-    .line.short { width: 60%; }
-    .line.long { width: 100%; }
-
-    .mockup-image {
-        width: 100%;
-        height: 200px;
-        background: linear-gradient(135deg, var(--accent-light), var(--bg-tertiary));
-        border-radius: var(--radius-md);
-        margin-bottom: 16px;
-    }
-
-    .mockup-actions {
-        display: flex;
-        gap: 16px;
-        font-size: 20px;
-        color: var(--text-secondary);
-    }
-
-    /* Features Section */
+    /* =====================================================
+       Features
+       ===================================================== */
     .landing-features {
         padding: 80px 40px;
         background: var(--bg-primary);
@@ -454,379 +109,66 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 32px;
         max-width: 1000px;
-        margin: 0 auto;
+        margin: auto;
     }
 
-    .feature-item {
-        text-align: center;
-        padding: 32px 24px;
-    }
-
-    .feature-icon-wrapper {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #405DE6, #833AB4);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-    }
-
-    .feature-icon-wrapper i {
-        font-size: 32px;
-        color: white;
-    }
-
-    .feature-item h3 {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 12px;
-    }
-
-    .feature-item p {
-        color: var(--text-secondary);
-        line-height: 1.6;
-    }
-
-    /* How It Works */
-    .landing-how-it-works {
-        padding: 80px 40px;
-        background: var(--bg-secondary);
-    }
-
-    .steps-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 24px;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    .step {
-        text-align: center;
-        flex: 1;
-    }
-
-    .step-number {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #405DE6, #833AB4);
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        font-weight: 700;
-        margin: 0 auto 16px;
-    }
-
-    .step h3 {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
-    }
-
-    .step p {
-        font-size: 14px;
-        color: var(--text-secondary);
-    }
-
-    .step-arrow {
-        color: var(--text-tertiary);
-        font-size: 24px;
-    }
-
-    /* Testimonials */
-    .landing-testimonials {
-        padding: 80px 40px;
-        background: var(--bg-primary);
-    }
-
-    .testimonials-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-
-    .testimonial-card {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 24px;
-    }
-
-    .testimonial-stars {
-        color: #fbbf24;
-        margin-bottom: 16px;
-    }
-
-    .testimonial-card > p {
-        font-size: 14px;
-        line-height: 1.6;
-        color: var(--text-secondary);
-        margin-bottom: 20px;
-    }
-
-    .testimonial-author {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .author-avatar {
-        width: 44px;
-        height: 44px;
-        background: linear-gradient(135deg, #405DE6, #833AB4);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-    }
-
-    .author-info strong {
-        display: block;
-        font-size: 14px;
-    }
-
-    .author-info span {
-        font-size: 12px;
-        color: var(--text-tertiary);
-    }
-
-    /* CTA Section */
-    .landing-cta {
-        padding: 100px 40px;
-        background: linear-gradient(135deg, #405DE6, #833AB4);
-        text-align: center;
-    }
-
-    .cta-content h2 {
-        font-size: 36px;
-        font-weight: 700;
-        color: white;
-        margin-bottom: 16px;
-    }
-
-    .cta-content p {
-        font-size: 18px;
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 32px;
-    }
-
-    .cta-content .btn {
-        background: white;
-        color: #833AB4;
-    }
-
-    .cta-content .btn:hover {
-        background: rgba(255, 255, 255, 0.9);
-    }
-
-    /* Landing Footer */
+    /* =====================================================
+       Footer
+       ===================================================== */
     .landing-footer {
         background: var(--bg-primary);
         border-top: 1px solid var(--border-color);
         padding: 60px 40px 30px;
     }
 
-    .footer-content {
-        display: flex;
-        justify-content: space-between;
-        max-width: 1000px;
-        margin: 0 auto 40px;
-    }
-
-    .footer-brand {
-        max-width: 250px;
-    }
-
-    .footer-brand .gradient-text {
-        font-size: 24px;
-        font-weight: 800;
-    }
-
-    .footer-brand p {
-        margin-top: 8px;
-        color: var(--text-secondary);
-        font-size: 14px;
-    }
-
-    .footer-links-grid {
-        display: flex;
-        gap: 60px;
-    }
-
-    .footer-column h4 {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 16px;
-    }
-
-    .footer-column a {
-        display: block;
-        color: var(--text-secondary);
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
-
-    .footer-column a:hover {
-        color: var(--accent-primary);
-    }
-
-    .footer-bottom {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 30px;
-        border-top: 1px solid var(--border-color);
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-
-    .footer-bottom p {
-        color: var(--text-tertiary);
-        font-size: 14px;
-    }
-
-    .social-links {
-        display: flex;
-        gap: 16px;
-    }
-
-    .social-links a {
-        width: 40px;
-        height: 40px;
-        background: var(--bg-tertiary);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-secondary);
-        font-size: 18px;
-        transition: all var(--transition-fast);
-    }
-
-    .social-links a:hover {
-        background: var(--accent-primary);
-        color: white;
-    }
-
-    /* Responsive */
+    /* =====================================================
+       Responsive
+       ===================================================== */
     @media (max-width: 900px) {
         .landing-hero {
             flex-direction: column;
             text-align: center;
-            padding: 60px 24px;
         }
-
-        .hero-content {
-            max-width: 100%;
-        }
-
-        .hero-title {
-            font-size: 36px;
-        }
-
-        .hero-buttons {
-            justify-content: center;
-        }
-
-        .hero-note {
-            justify-content: center;
-        }
-
-        .features-row,
-        .testimonials-grid {
+        .features-row {
             grid-template-columns: 1fr;
-        }
-
-        .steps-container {
-            flex-direction: column;
-        }
-
-        .step-arrow {
-            transform: rotate(90deg);
-        }
-
-        .footer-content {
-            flex-direction: column;
-            gap: 40px;
-        }
-
-        .footer-links-grid {
-            gap: 40px;
-        }
-
-        .footer-bottom {
-            flex-direction: column;
-            gap: 20px;
-            text-align: center;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .landing-nav {
-            padding: 16px 20px;
-        }
-
-        .landing-nav-links a:not(.btn) {
-            display: none;
-        }
-
-        .hero-title {
-            font-size: 28px;
-        }
-
-        .hero-subtitle {
-            font-size: 16px;
-        }
-
-        .hero-buttons {
-            flex-direction: column;
-        }
-
-        .hero-buttons .btn {
-            width: 100%;
-        }
-
-        .hero-mockup {
-            width: 100%;
-            max-width: 280px;
-        }
-
-        .section-title {
-            font-size: 24px;
-        }
-
-        .landing-features,
-        .landing-how-it-works,
-        .landing-testimonials {
-            padding: 60px 20px;
-        }
-
-        .landing-cta {
-            padding: 60px 20px;
-        }
-
-        .cta-content h2 {
-            font-size: 28px;
-        }
-
-        .footer-links-grid {
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-
-        .footer-column {
-            min-width: 120px;
         }
     }
 </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="landing-page">
+
+    <!-- NAVBAR -->
+    <nav class="landing-nav">
+        <a href="{% url 'landing' %}" class="landing-logo">
+            <span class="gradient-text">SkillSync</span>
+        </a>
+        <div class="landing-nav-links">
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Sign Up</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="landing-hero">
+        <div>
+            <h1 class="hero-title">
+                Share Your <span class="gradient-text">Skills</span><br>
+                Grow Your <span class="gradient-text">Network</span>
+            </h1>
+            <p class="hero-subtitle">
+                Join a community of learners and creators.
+            </p>
+            <div class="hero-buttons">
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Get Started</a>
+                <a href="{% url 'about' %}" class="btn btn-outline btn-lg">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+</div>
+
 {% endblock %}
