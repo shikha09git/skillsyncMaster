@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify OTP - SkillSync{% endblock %}
+
+{% block extra_css %}
+<style>
+.sidebar{display:none!important}.main-content{margin-left:0!important}.bottom-nav{display:none!important}
+.auth-icon{width:96px;height:96px;border:3px solid var(--text-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.auth-icon i{font-size:40px;color:var(--text-primary);}
+.auth-title-alt{text-align:center;font-size:18px;font-weight:600;margin-bottom:12px;}
+.otp-input-container{display:flex;justify-content:center;gap:8px;}
+.otp-input{width:45px;height:55px;text-align:center;font-size:24px;font-weight:700;border:2px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-secondary);color:var(--text-primary);}
+.otp-input:focus{outline:none;border-color:var(--accent-primary);box-shadow:0 0 0 3px var(--accent-light);}
+.resend-btn{background:none;border:none;color:var(--accent-primary);font-weight:600;font-size:14px;cursor:pointer;}
+.resend-btn:disabled{color:var(--text-tertiary);cursor:not-allowed;}
+.back-to-login{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text-primary);font-weight:600;font-size:14px;}
+.back-to-login:hover{color:var(--accent-primary);}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+    <h2 class="auth-title-alt">Enter OTP</h2>
+    <p class="text-muted text-center mb-4">We've sent a 6-digit code to <strong>{{ email }}</strong></p>
+
+    {% if error %}
+    <div class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i>{{ error }}</div>
+    {% endif %}
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" class="auth-form" id="otpForm">
+      {% csrf_token %}
+      <input type="hidden" name="email" value="{{ email }}">
+      <div class="otp-input-container">
+        {% for i in "123456" %}
+        <input type="text" name="otp{{ forloop.counter }}" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required {% if forloop.first %}autofocus{% endif %}>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="otp" id="otpHidden">
+      <button type="submit" class="btn btn-primary btn-block mt-4">Verify OTP</button>
+    </form>
+
+    <div class="resend-otp mt-4 text-center">
+      <p class="text-muted">Didn't receive the code?</p>
+      <form method="POST" action="{% url 'resend_otp' %}">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ email }}">
+        <button type="submit" class="resend-btn" id="resendBtn">Resend OTP</button>
+      </form>
+      <p class="text-small text-muted mt-2" id="timerText"></p>
+    </div>
+  </div>
+
+  <div class="auth-card auth-card-secondary">
+    <a href="{% url 'forgot_password' %}" class="back-to-login"><i class="fa-solid fa-arrow-left"></i> Try different email</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  const inputs=document.querySelectorAll('.otp-input');
+  const otpHidden=document.getElementById('otpHidden');
+  inputs.forEach((input,idx)=>{
+    input.addEventListener('input',e=>{
+      if(!/^\d$/.test(e.target.value)){e.target.value='';return;}
+      if(idx<inputs.length-1)inputs[idx+1].focus();
+    });
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Backspace'&&!e.target.value&&idx>0){inputs[idx-1].focus();}
+    });
+  });
+  document.getElementById('otpForm').addEventListener('submit',e=>{
+    let otp='';inputs.forEach(inp=>otp+=inp.value);
+    if(otp.length!==6){e.preventDefault();showToast('Enter all 6 digits','error');return;}
+    otpHidden.value=otp;
+  });
+  const resendBtn=document.getElementById('resendBtn');
+  const timerText=document.getElementById('timerText');
+  let countdown=60;
+  function startTimer(){
+    resendBtn.disabled=true;
+    const timer=setInterval(()=>{
+      countdown--;timerText.textContent=`Resend available in ${countdown}s`;
+      if(countdown<=0){clearInterval(timer);resendBtn.disabled=false;timerText.textContent='';countdown=60;}
+    },1000);
+  }
+  startTimer();
+});
+</script>
+{% endblock %}

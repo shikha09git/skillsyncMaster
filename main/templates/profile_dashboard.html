@@ -1,0 +1,618 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }} — Dashboard{% endblock %}
+
+{% block content %}
+<div class="profile-dashboard" style="max-width:1000px;margin:28px auto;padding:20px;">
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+    <div style="width:84px;height:84px;">
+      {% if profile_user.profile.get_profile_picture_url %}
+        <img src="{{ profile_user.profile.get_profile_picture_url }}" alt="{{ profile_user.username }}" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid #1d4ed8;">
+      {% else %}
+        <div style="width:84px;height:84px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f172a;">
+          {{ profile_user.username|first|upper }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div>
+      <h2 style="margin:0;font-size:20px;">{{ profile_user.profile.full_name|default:profile_user.username }}</h2>
+      <div style="color:#6b7280;margin-top:6px;">
+        <strong>{{ followers_count }}</strong> followers • <strong>{{ following_count }}</strong> following
+      </div>
+    </div>
+
+    <div style="margin-left:auto;">
+      {% if user.is_authenticated and user != profile_user %}
+        {% if viewer_follows %}
+          <form action="{% url 'unfollow' profile_user.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="see-more-btn" style="background:#ef4444;">Unfollow</button>
+          </form>
+        {% else %}
+          <a href="{% url 'send_follow_request' profile_user.id %}" class="see-more-btn">Follow</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="margin-bottom:24px;display:flex;gap:16px;">
+    <a href="#followers" onclick="showTab('followers')" id="followersTab" style="padding:8px 24px;border-radius:8px;background:#f1f5f9;color:#1d4ed8;font-weight:600;text-decoration:none;cursor:pointer;">Followers</a>
+    <a href="#following" onclick="showTab('following')" id="followingTab" style="padding:8px 24px;border-radius:8px;background:#f1f5f9;color:#1d4ed8;font-weight:600;text-decoration:none;cursor:pointer;">Following</a>
+  </div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;">
+    <div id="followersSection" style="flex:1;min-width:320px;">
+      <h3 style="margin-bottom:12px;">Followers</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+        {% for rel in followers_page %}
+          <div style="padding:12px;background:#fff;border-radius:10px;border:1px solid #f0f4f8;display:flex;align-items:center;gap:12px;">
+            <a href="{% url 'view_profile' rel.follower.username %}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+              {% if rel.follower.profile.get_profile_picture_url %}
+                <img src="{{ rel.follower.profile.get_profile_picture_url }}" alt="{{ rel.follower.username }}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;">
+              {% else %}
+                <div style="width:44px;height:44px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f172a;">
+                  {{ rel.follower.username|first|upper }}
+                </div>
+              {% endif %}
+              <div>
+                <div style="font-weight:700;">{{ rel.follower.profile.full_name|default:rel.follower.username }}</div>
+                <div style="color:#6b7280;font-size:13px;">@{{ rel.follower.username }}</div>
+              </div>
+            </a>
+            <div style="margin-left:auto;">
+              {% if user.is_authenticated and user != rel.follower %}
+                {% if rel.follower.id in viewer_following_ids %}
+                  <form action="{% url 'unfollow' rel.follower.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="post-action" style="background:#ef4444;color:white;border-radius:6px;padding:6px 10px;border:none;">Unfollow</button>
+                  </form>
+                {% else %}
+                  <a href="{% url 'send_follow_request' rel.follower.id %}" class="post-action" style="padding:6px 10px;border-radius:6px;background:#1d4ed8;color:white;text-decoration:none;">Follow</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <p style="color:#9ca3af;">No followers yet.</p>
+        {% endfor %}
+      </div>
+
+      {% if followers_page.has_other_pages %}
+        <div style="margin-top:12px;">
+          {% if followers_page.has_previous %}
+            <a href="?followers_page={{ followers_page.previous_page_number }}" class="post-action">← Prev</a>
+          {% endif %}
+          <span style="margin:0 8px;">Page {{ followers_page.number }} of {{ followers_page.paginator.num_pages }}</span>
+          {% if followers_page.has_next %}
+            <a href="?followers_page={{ followers_page.next_page_number }}" class="post-action">Next →</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div id="followingSection" style="flex:1;min-width:320px;display:none;">
+      <h3 style="margin-bottom:12px;">Following</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+        <script>
+        function showTab(tab) {
+          document.getElementById('followersSection').style.display = tab === 'followers' ? '' : 'none';
+          document.getElementById('followingSection').style.display = tab === 'following' ? '' : 'none';
+          document.getElementById('followersTab').style.background = tab === 'followers' ? '#1d4ed8' : '#f1f5f9';
+          document.getElementById('followersTab').style.color = tab === 'followers' ? '#fff' : '#1d4ed8';
+          document.getElementById('followingTab').style.background = tab === 'following' ? '#1d4ed8' : '#f1f5f9';
+          document.getElementById('followingTab').style.color = tab === 'following' ? '#fff' : '#1d4ed8';
+        }
+        // Default to followers tab
+        showTab('followers');
+        </script>
+        {% for rel in following_page %}
+          <div style="padding:12px;background:#fff;border-radius:10px;border:1px solid #f0f4f8;display:flex;align-items:center;gap:12px;">
+            <a href="{% url 'view_profile' rel.following.username %}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+              {% if rel.following.profile.get_profile_picture_url %}
+                <img src="{{ rel.following.profile.get_profile_picture_url }}" alt="{{ rel.following.username }}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;">
+              {% else %}
+                <div style="width:44px;height:44px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f172a;">
+                  {{ rel.following.username|first|upper }}
+                </div>
+              {% endif %}
+              <div>
+                <div style="font-weight:700;">{{ rel.following.profile.full_name|default:rel.following.username }}</div>
+                <div style="color:#6b7280;font-size:13px;">@{{ rel.following.username }}</div>
+              </div>
+            </a>
+            <div style="margin-left:auto;">
+              {% if user.is_authenticated and user != rel.following %}
+                {% if rel.following.id in viewer_following_ids %}
+                  <form action="{% url 'unfollow' rel.following.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="post-action" style="background:#ef4444;color:white;border-radius:6px;padding:6px 10px;border:none;">Unfollow</button>
+                  </form>
+                {% else %}
+                  <a href="{% url 'send_follow_request' rel.following.id %}" class="post-action" style="padding:6px 10px;border-radius:6px;background:#1d4ed8;color:white;text-decoration:none;">Follow</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <p style="color:#9ca3af;">Not following anyone yet.</p>
+        {% endfor %}
+      </div>
+
+      {% if following_page.has_other_pages %}
+        <div style="margin-top:12px;">
+          {% if following_page.has_previous %}
+            <a href="?following_page={{ following_page.previous_page_number }}" class="post-action">← Prev</a>
+          {% endif %}
+          <span style="margin:0 8px;">Page {{ following_page.number }} of {{ following_page.paginator.num_pages }}</span>
+          {% if following_page.has_next %}
+            <a href="?following_page={{ following_page.next_page_number }}" class="post-action">Next →</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}
+
+
+
+
+*** End Patch
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .see-more-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+  }
+
+  .post-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+  }
+
+  .post-action:hover {
+    color: #1d4ed8;
+    background: rgba(29, 78, 216, 0.08);
+  }
+
+  .profile-dashboard {
+    max-width: 1000px;
+    margin: 28px auto;
+    padding: 20px;
+  }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .avatar-large {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #1d4ed8;
+  }
+
+  .avatar-fallback-large {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 32px;
+  }
+
+  .profile-info h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: #1f2937;
+  }
+
+  .profile-stats {
+    color: #6b7280;
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .profile-stats strong {
+    color: #1f2937;
+    font-weight: 700;
+  }
+
+  .section-container {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .section {
+    flex: 1;
+    min-width: 320px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #1f2937;
+  }
+
+  .user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .user-card {
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .user-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+  }
+
+  .user-avatar-fallback {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 16px;
+  }
+
+  .user-info-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .user-name {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-handle {
+    color: #6b7280;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .pagination-text {
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+  }
+
+  /* Dark Mode Support */
+  body.dark-mode .profile-header,
+  body.dark-mode .section {
+    background: #1e293b;
+    color: #e2e8f0;
+  }
+
+  body.dark-mode .profile-info h2,
+  body.dark-mode .section h3,
+  body.dark-mode .user-name {
+    color: #e0e7ff;
+  }
+
+  body.dark-mode .user-card {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  body.dark-mode .user-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .profile-stats,
+  body.dark-mode .user-handle,
+  body.dark-mode .pagination-text,
+  body.dark-mode .empty-state {
+    color: #94a3b8;
+  }
+
+  body.dark-mode .profile-stats strong {
+    color: #e0e7ff;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .profile-dashboard {
+      padding: 16px;
+    }
+
+    .profile-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .section-container {
+      flex-direction: column;
+    }
+
+    .user-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="profile-dashboard">
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div>
+      {% if profile_user.profile.get_profile_picture_url %}
+        <img src="{{ profile_user.profile.get_profile_picture_url }}" 
+             alt="{{ profile_user.username }}" 
+             class="avatar-large"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="avatar-fallback-large" style="display:none;">
+          {{ profile_user.username|first|upper }}
+        </div>
+      {% elif profile_user.profile.profile_picture %}
+        <img src="{{ profile_user.profile.profile_picture.url }}" 
+             alt="{{ profile_user.username }}" 
+             class="avatar-large"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="avatar-fallback-large" style="display:none;">
+          {{ profile_user.username|first|upper }}
+        </div>
+      {% else %}
+        <div class="avatar-fallback-large">
+          {{ profile_user.username|first|upper }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="profile-info">
+      <h2>{{ profile_user.profile.full_name|default:profile_user.username }}</h2>
+      <div class="profile-stats">
+        <strong>{{ followers_count }}</strong> followers • 
+        <strong>{{ following_count }}</strong> following
+      </div>
+    </div>
+
+    <div style="margin-left: auto;">
+      {% if user.is_authenticated and user != profile_user %}
+        {% if viewer_follows %}
+          <form action="{% url 'unfollow' profile_user.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="see-more-btn" style="background:#ef4444;">Unfollow</button>
+          </form>
+        {% else %}
+          <form action="{% url 'send_follow_request' profile_user.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="see-more-btn">Follow</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Followers and Following Sections -->
+  <div class="section-container">
+    <!-- Followers Section -->
+    <div class="section">
+      <h3>Followers ({{ followers_count }})</h3>
+      {% if followers_page %}
+        <div class="user-grid">
+          {% for rel in followers_page %}
+            <div class="user-card">
+              <a href="{% url 'view_profile' rel.follower.username %}" 
+                 style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; flex: 1; min-width: 0;">
+                {% if rel.follower.profile.get_profile_picture_url %}
+                  <img src="{{ rel.follower.profile.get_profile_picture_url }}" 
+                       alt="{{ rel.follower.username }}" 
+                       class="user-avatar"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div class="user-avatar-fallback" style="display:none;">
+                    {{ rel.follower.username|first|upper }}
+                  </div>
+                {% elif rel.follower.profile.profile_picture %}
+                  <img src="{{ rel.follower.profile.profile_picture.url }}" 
+                       alt="{{ rel.follower.username }}" 
+                       class="user-avatar"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div class="user-avatar-fallback" style="display:none;">
+                    {{ rel.follower.username|first|upper }}
+                  </div>
+                {% else %}
+                  <div class="user-avatar-fallback">
+                    {{ rel.follower.username|first|upper }}
+                  </div>
+                {% endif %}
+                <div class="user-info-text">
+                  <div class="user-name">{{ rel.follower.profile.full_name|default:rel.follower.username }}</div>
+                  <div class="user-handle">@{{ rel.follower.username }}</div>
+                </div>
+              </a>
+              {% if user.is_authenticated and user != rel.follower %}
+                <div style="margin-left: auto;">
+                  {% if rel.follower.id in viewer_following_ids %}
+                    <form action="{% url 'unfollow' rel.follower.id %}" method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="post-action" style="background:#ef4444; color:white;">Unfollow</button>
+                    </form>
+                  {% else %}
+                    <form action="{% url 'send_follow_request' rel.follower.id %}" method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="post-action" style="background:#1d4ed8; color:white;">Follow</button>
+                    </form>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% empty %}
+            <div class="empty-state">
+              <p>No followers yet.</p>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if followers_page.has_other_pages %}
+          <div class="pagination">
+            {% if followers_page.has_previous %}
+              <a href="?followers_page={{ followers_page.previous_page_number }}" class="post-action">← Prev</a>
+            {% endif %}
+            <span class="pagination-text">Page {{ followers_page.number }} of {{ followers_page.paginator.num_pages }}</span>
+            {% if followers_page.has_next %}
+              <a href="?followers_page={{ followers_page.next_page_number }}" class="post-action">Next →</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <p>No followers yet.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Following Section -->
+    <div class="section">
+      <h3>Following ({{ following_count }})</h3>
+      {% if following_page %}
+        <div class="user-grid">
+          {% for rel in following_page %}
+            <div class="user-card">
+              <a href="{% url 'view_profile' rel.following.username %}" 
+                 style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; flex: 1; min-width: 0;">
+                {% if rel.following.profile.get_profile_picture_url %}
+                  <img src="{{ rel.following.profile.get_profile_picture_url }}" 
+                       alt="{{ rel.following.username }}" 
+                       class="user-avatar"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div class="user-avatar-fallback" style="display:none;">
+                    {{ rel.following.username|first|upper }}
+                  </div>
+                {% elif rel.following.profile.profile_picture %}
+                  <img src="{{ rel.following.profile.profile_picture.url }}" 
+                       alt="{{ rel.following.username }}" 
+                       class="user-avatar"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div class="user-avatar-fallback" style="display:none;">
+                    {{ rel.following.username|first|upper }}
+                  </div>
+                {% else %}
+                  <div class="user-avatar-fallback">
+                    {{ rel.following.username|first|upper }}
+                  </div>
+                {% endif %}
+                <div class="user-info-text">
+                  <div class="user-name">{{ rel.following.profile.full_name|default:rel.following.username }}</div>
+                  <div class="user-handle">@{{ rel.following.username }}</div>
+                </div>
+              </a>
+              {% if user.is_authenticated and user != rel.following %}
+                <div style="margin-left: auto;">
+                  {% if rel.following.id in viewer_following_ids %}
+                    <form action="{% url 'unfollow' rel.following.id %}" method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="post-action" style="background:#ef4444; color:white;">Unfollow</button>
+                    </form>
+                  {% else %}
+                    <form action="{% url 'send_follow_request' rel.following.id %}" method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="post-action" style="background:#1d4ed8; color:white;">Follow</button>
+                    </form>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% empty %}
+            <div class="empty-state">
+              <p>Not following anyone yet.</p>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if following_page.has_other_pages %}
+          <div class="pagination">
+            {% if following_page.has_previous %}
+              <a href="?following_page={{ following_page.previous_page_number }}" class="post-action">← Prev</a>
+            {% endif %}
+            <span class="pagination-text">Page {{ following_page.number }} of {{ following_page.paginator.num_pages }}</span>
+            {% if following_page.has_next %}
+              <a href="?following_page={{ following_page.next_page_number }}" class="post-action">Next →</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <p>Not following anyone yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

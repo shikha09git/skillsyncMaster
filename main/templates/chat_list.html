@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages - SkillSync{% endblock %}
+
+{% block content %}
+
+<div class="chat-container">
+    
+    <div class="chat-header">
+        <h1 class="chat-title">
+            <i class="fa-solid fa-message"></i> Messages
+        </h1>
+    </div>
+
+    {% if chat_rooms %}
+        <div class="chat-list">
+            {% for room in chat_rooms %}
+                {% if room.user1 == user %}
+                    {% with other=room.user2 %}
+                        <a href="{% url 'chat_detail' room.id %}" class="chat-item">
+                            <div class="chat-avatar">
+                                {% if other.profile and other.profile.profile_picture and other.profile.get_profile_picture_url %}
+                                    <img src="{{ other.profile.get_profile_picture_url }}" 
+                                         alt="{{ other.username }}"
+                                         onerror="handleImageError(this)">
+                                    <div class="avatar-placeholder" style="display: none;">
+                                        {{ other.username|first|upper }}
+                                    </div>
+                                {% else %}
+                                    <div class="avatar-placeholder">
+                                        {{ other.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="chat-info">
+                                <div class="chat-name">
+                                    {% if other.profile and other.profile.full_name %}
+                                        {{ other.profile.full_name }}
+                                    {% else %}
+                                        {{ other.username }}
+                                    {% endif %}
+                                </div>
+                                <div class="chat-last-message">
+                                    {% if room.last_message %}
+                                        {% if room.last_message.sender == user %}
+                                            You: {{ room.last_message.text|truncatewords:8 }}
+                                        {% else %}
+                                            {{ room.last_message.text|truncatewords:8 }}
+                                        {% endif %}
+                                    {% else %}
+                                        No messages yet
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="chat-meta">
+                                {% if room.last_message %}
+                                    <div class="chat-time">{{ room.last_message.timestamp|timesince }}</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endwith %}
+                {% else %}
+                    {% with other=room.user1 %}
+                        <a href="{% url 'chat_detail' room.id %}" class="chat-item">
+                            <div class="chat-avatar">
+                                {% if other.profile and other.profile.profile_picture and other.profile.get_profile_picture_url %}
+                                    <img src="{{ other.profile.get_profile_picture_url }}" 
+                                         alt="{{ other.username }}"
+                                         onerror="handleImageError(this)">
+                                    <div class="avatar-placeholder" style="display: none;">
+                                        {{ other.username|first|upper }}
+                                    </div>
+                                {% else %}
+                                    <div class="avatar-placeholder">
+                                        {{ other.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="chat-info">
+                                <div class="chat-name">
+                                    {% if other.profile and other.profile.full_name %}
+                                        {{ other.profile.full_name }}
+                                    {% else %}
+                                        {{ other.username }}
+                                    {% endif %}
+                                </div>
+                                <div class="chat-last-message">
+                                    {% if room.last_message %}
+                                        {% if room.last_message.sender == user %}
+                                            You: {{ room.last_message.text|truncatewords:8 }}
+                                        {% else %}
+                                            {{ room.last_message.text|truncatewords:8 }}
+                                        {% endif %}
+                                    {% else %}
+                                        No messages yet
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="chat-meta">
+                                {% if room.last_message %}
+                                    <div class="chat-time">{{ room.last_message.timestamp|timesince }}</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endwith %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <h2 class="empty-state-title">No Messages Yet</h2>
+            <p class="empty-state-text">Start a conversation with someone!</p>
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

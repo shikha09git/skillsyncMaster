@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - SkillSync{% endblock %}
+
+{% block content %}
+
+<div class="feed-container">
+    
+    <!-- ================================================================
+         SEARCH BAR
+         ================================================================ -->
+    <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <form action="{% url 'search' %}" method="get">
+            <input type="search" 
+                   name="q" 
+                   placeholder="Search posts, people, topics..." 
+                   value="{{ query|default:'' }}"
+                   autocomplete="off">
+        </form>
+    </div>
+
+    <!-- ================================================================
+         FOLLOW REQUESTS (if any)
+         ================================================================ -->
+    {% if user.is_authenticated and follow_requests %}
+    <div class="follow-requests-card">
+        <div class="follow-requests-header">
+            <h3><i class="fa-solid fa-user-plus"></i> Follow Requests</h3>
+        </div>
+        <div class="follow-requests-list">
+            {% for req in follow_requests %}
+            <div class="follow-request-item">
+                <div class="request-user">
+                    <div class="request-avatar">
+                        {% if req.sender.profile and req.sender.profile.get_profile_picture_url %}
+                            <img src="{{ req.sender.profile.get_profile_picture_url }}" 
+                                 alt="{{ req.sender.username }}"
+                                 onerror="handleImageError(this)">
+                            <div class="avatar-placeholder" style="display:none;">{{ req.sender.username|first|upper }}</div>
+                        {% else %}
+                            <div class="avatar-placeholder">{{ req.sender.username|first|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'view_profile' req.sender.username %}" class="request-username">
+                        {{ req.sender.username }}
+                    </a>
+                </div>
+                <div class="request-actions">
+                    <form method="POST" action="{% url 'accept_request' req.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-accept">Accept</button>
+                    </form>
+                    <form method="POST" action="{% url 'reject_request' req.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-reject">Reject</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ================================================================
+         FEED HEADER
+         ================================================================ -->
+    <div class="feed-header">
+        <h1 class="feed-title">✨ Your Feed</h1>
+        <p class="feed-subtitle">Discover amazing content from the community</p>
+    </div>
+
+    <!-- ================================================================
+         POSTS
+         ================================================================ -->
+    {% if contents %}
+        {% for content in contents %}
+        <article class="post-card" data-post-id="{{ content.id }}">
+            
+            <!-- ========================================================
+                 POST HEADER
+                 ======================================================== -->
+            <header class="post-header">
+                <!-- Avatar -->
+                <a href="{% url 'view_profile' content.created_by.username %}" class="post-avatar">
+                    {% if content.created_by.profile and content.created_by.profile.profile_picture and content.created_by.profile.get_profile_picture_url %}
+                        <img src="{{ content.created_by.profile.get_profile_picture_url }}" 
+                             alt="{{ content.created_by.username }}"
+                             onerror="handleImageError(this)">
+                        <div class="avatar-placeholder" style="display: none;">
+                            {{ content.created_by.username|first|upper }}
+                        </div>
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            {{ content.created_by.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </a>
+                
+                <!-- User Info -->
+                <div class="post-user-info">
+                    <div class="post-username">
+                        <a href="{% url 'view_profile' content.created_by.username %}">
+                            {% if content.created_by.profile and content.created_by.profile.full_name %}
+                                {{ content.created_by.profile.full_name }}
+                            {% else %}
+                                {{ content.created_by.username }}
+                            {% endif %}
+                        </a>
+                    </div>
+                    <div class="post-time">{{ content.created_at|timesince }} ago</div>
+                </div>
+
+                <!-- Follow Button / Actions -->
+                <div class="post-header-right">
+                    {% if user.is_authenticated and user != content.created_by and content.created_by.id %}
+                        {% if content.created_by.id in following %}
+                            <form method="POST" action="{% url 'unfollow' content.created_by.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="follow-btn following">Following</button>
+                            </form>
+                        {% elif content.created_by.id in sent_requests %}
+                            <button class="follow-btn requested" disabled>Requested</button>
+                        {% else %}
+                            <form method="POST" action="{% url 'send_follow_request' content.created_by.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="follow-btn">Follow</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </header>
+
+            <!-- ========================================================
+                 POST MEDIA
+                 ======================================================== -->
+            {% if content.image %}
+                <div class="post-media">
+                    <img src="{{ content.image.url }}" 
+                         alt="{{ content.title }}" 
+                         loading="lazy"
+                         onerror="this.parentElement.innerHTML='<div class=\'post-media-placeholder\'><i class=\'fa-solid fa-image\'></i><span>Image not available</span></div>';">
+                </div>
+            {% elif content.video %}
+                <div class="post-media">
+                    <video controls preload="metadata">
+                        <source src="{{ content.video.url }}" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                </div>
+            {% elif content.pdf %}
+                <div class="post-media">
+                    <div class="post-media-placeholder pdf-placeholder">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>PDF Document</span>
+                    </div>
+                </div>
+                <a href="{{ content.pdf.url }}" target="_blank" class="pdf-badge">
+                    <i class="fa-solid fa-download"></i> Download PDF
+                </a>
+            {% else %}
+                <div class="post-media">
+                    <div class="post-media-placeholder">
+                        <i class="fa-solid fa-image"></i>
+                        <span>No media</span>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- ========================================================
+                 POST ACTIONS
+                 ======================================================== -->
+            <div class="post-actions">
+                <!-- Like Button -->
+                <button class="post-action-btn like-btn {% if user in content.likes.all %}liked{% endif %}" 
+                        data-post-id="{{ content.id }}"
+                        title="Like">
+                    <i class="{% if user in content.likes.all %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                </button>
+                
+                <!-- Comment Button -->
+                <a href="{% url 'content_detail' content.id %}" class="post-action-btn" title="Comments">
+                    <i class="fa-regular fa-comment"></i>
+                </a>
+                
+                <!-- Share Button -->
+                <button class="post-action-btn share-btn" 
+                        data-url="{% url 'content_detail' content.id %}"
+                        data-title="{{ content.title }}"
+                        title="Share">
+                    <i class="fa-regular fa-paper-plane"></i>
+                </button>
+                
+                <!-- Delete Button (Owner Only) -->
+                {% if content.created_by == user %}
+                <form method="POST" action="{% url 'delete_content' content.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="post-action-btn delete-post-btn" 
+                            onclick="return confirm('Are you sure you want to delete this post?')"
+                            title="Delete">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                </form>
+                {% endif %}
+                
+                <!-- Bookmark Button -->
+                <button class="post-action-btn bookmark" title="Save">
+                    <i class="fa-regular fa-bookmark"></i>
+                </button>
+            </div>
+
+            <!-- ========================================================
+                 POST STATS
+                 ======================================================== -->
+            <div class="post-stats" id="likes-{{ content.id }}">
+                {{ content.likes.count }} like{{ content.likes.count|pluralize }}
+            </div>
+
+            <!-- ========================================================
+                 POST CAPTION
+                 ======================================================== -->
+            <div class="post-caption">
+                <strong>{{ content.created_by.username }}</strong>
+                <span class="title">{{ content.title }}</span>
+                {% if content.description %}
+                    <p class="post-description">{{ content.description|truncatewords:25 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- ========================================================
+                 POST META (Instructor, Duration)
+                 ======================================================== -->
+            {% if content.instructor or content.duration %}
+            <div class="post-meta">
+                {% if content.instructor %}
+                    <span class="post-meta-item">
+                        <i class="fa-solid fa-chalkboard-user"></i> {{ content.instructor }}
+                    </span>
+                {% endif %}
+                {% if content.duration %}
+                    <span class="post-meta-item">
+                        <i class="fa-solid fa-clock"></i> {{ content.duration }}
+                    </span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- ========================================================
+                 VIEW COMMENTS LINK
+                 ======================================================== -->
+            {% if content.comment_set.count > 0 %}
+                <a href="{% url 'content_detail' content.id %}" class="view-comments">
+                    View all {{ content.comment_set.count }} comment{{ content.comment_set.count|pluralize }}
+                </a>
+            {% endif %}
+
+            <!-- ========================================================
+                 ADD COMMENT FORM
+                 ======================================================== -->
+            {% if user.is_authenticated %}
+            <form class="add-comment-form" data-post-id="{{ content.id }}">
+                {% csrf_token %}
+                <input type="text" 
+                       name="body" 
+                       placeholder="Add a comment..." 
+                       autocomplete="off" 
+                       maxlength="500">
+                <button type="submit" disabled>Post</button>
+            </form>
+            {% endif %}
+
+        </article>
+        {% endfor %}
+        
+    {% else %}
+        <!-- ============================================================
+             EMPTY STATE
+             ============================================================ -->
+        <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <h2 class="empty-state-title">No Posts Yet</h2>
+            <p class="empty-state-text">Be the first to share something amazing with the community!</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'add_content' %}" class="btn btn-primary mt-4">
+                    <i class="fa-solid fa-plus"></i> Create Post
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary mt-4">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login to Post
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<footer class="footer">
+    <div class="footer-links">
+        <a href="{% url 'about' %}">About</a>
+        <a href="#">Help</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+    </div>
+    <p>© 2025 SkillSync. Made with ❤️</p>
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrftoken = getCookie('csrftoken');
+
+    // ==================================================================
+    // LIKE BUTTON HANDLER
+    // ==================================================================
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const postId = this.dataset.postId;
+            if (!postId) return;
+            
+            fetch(`/content/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const icon = this.querySelector('i');
+                
+                if (data.liked) {
+                    this.classList.add('liked');
+                    icon.className = 'fa-solid fa-heart';
+                } else {
+                    this.classList.remove('liked');
+                    icon.className = 'fa-regular fa-heart';
+                }
+                
+                const likesEl = document.getElementById(`likes-${postId}`);
+                if (likesEl) {
+                    likesEl.textContent = `${data.total_likes} like${data.total_likes !== 1 ? 's' : ''}`;
+                }
+            })
+            .catch(err => {
+                console.error('Like error:', err);
+                showToast('Failed to like post', 'error');
+            });
+        });
+    });
+
+    // ==================================================================
+    // COMMENT FORM HANDLER
+    // ==================================================================
+    document.querySelectorAll('.add-comment-form').forEach(form => {
+        const input = form.querySelector('input[name="body"]');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        if (!input || !submitBtn) return;
+        
+        input.addEventListener('input', function() {
+            submitBtn.disabled = !this.value.trim();
+        });
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const postId = this.dataset.postId;
+            const body = input.value.trim();
+            
+            if (!body || !postId) return;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
+            
+            const formData = new FormData();
+            formData.append('body', body);
+            
+            fetch(`/content/${postId}/comment/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = '';
+                    submitBtn.textContent = 'Post';
+                    showToast('Comment added!', 'success');
+                    
+                    const postCard = form.closest('.post-card');
+                    const viewCommentsLink = postCard.querySelector('.view-comments');
+                    
+                    if (viewCommentsLink) {
+                        const currentCount = parseInt(viewCommentsLink.textContent.match(/\d+/) || 0);
+                        viewCommentsLink.textContent = `View all ${currentCount + 1} comments`;
+                    }
+                } else {
+                    showToast(data.error || 'Failed to add comment', 'error');
+                    submitBtn.textContent = 'Post';
+                }
+            })
+            .catch(err => {
+                console.error('Comment error:', err);
+                showToast('Failed to add comment', 'error');
+                submitBtn.textContent = 'Post';
+            });
+        });
+    });
+
+    // ==================================================================
+    // SHARE BUTTON HANDLER
+    // ==================================================================
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = window.location.origin + this.dataset.url;
+            const title = this.dataset.title || 'Check this out!';
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    url: url
+                }).catch(err => console.log('Share cancelled'));
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Link copied to clipboard!', 'success');
+                }).catch(() => {
+                    showToast('Failed to copy link', 'error');
+                });
+            }
+        });
+    });
+
+    // ==================================================================
+    // BOOKMARK BUTTON HANDLER
+    // ==================================================================
+    document.querySelectorAll('.bookmark').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            const isBookmarked = icon.classList.contains('fa-solid');
+            
+            if (isBookmarked) {
+                icon.className = 'fa-regular fa-bookmark';
+                this.classList.remove('bookmarked');
+                showToast('Removed from saved', 'success');
+            } else {
+                icon.className = 'fa-solid fa-bookmark';
+                this.classList.add('bookmarked');
+                showToast('Saved!', 'success');
+            }
+        });
+    });
+
+    // ==================================================================
+    // DOUBLE-CLICK TO LIKE (Instagram-style)
+    // ==================================================================
+    document.querySelectorAll('.post-media').forEach(media => {
+        media.addEventListener('dblclick', function() {
+            const postCard = this.closest('.post-card');
+            const likeBtn = postCard.querySelector('.like-btn');
+            
+            if (likeBtn && !likeBtn.classList.contains('liked')) {
+                likeBtn.click();
+                showHeartAnimation(this);
+            }
+        });
+    });
+
+    function showHeartAnimation(element) {
+        const heart = document.createElement('i');
+        heart.className = 'fa-solid fa-heart';
+        heart.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 80px;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 10;
+            animation: heartPop 0.8s ease forwards;
+        `;
+        
+        element.style.position = 'relative';
+        element.appendChild(heart);
+        
+        setTimeout(() => heart.remove(), 800);
+    }
+});
+</script>
+{% endblock %}

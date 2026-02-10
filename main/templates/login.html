@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - SkillSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sidebar { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .bottom-nav { display: none !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    
+    <div class="auth-card">
+        
+        <h1 class="auth-logo">SkillSync</h1>
+        
+        {% if error %}
+        <div class="alert alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                <i class="fa-solid fa-circle-info"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <input type="text" 
+                       name="username" 
+                       class="form-input" 
+                       placeholder="Username" 
+                       value="{{ username|default:'' }}"
+                       required 
+                       autocomplete="username"
+                       autofocus>
+            </div>
+            
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           class="form-input" 
+                           placeholder="Password" 
+                           required
+                           autocomplete="current-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fa-regular fa-eye" id="passwordIcon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                Log In
+            </button>
+        </form>
+
+        <div class="auth-divider">
+            <span>OR</span>
+        </div>
+
+        <form method="POST" action="{% url 'guest_login' %}">
+            {% csrf_token %}
+            <button type="submit" class="social-btn">
+                <i class="fa-solid fa-user"></i>
+                Continue as Guest
+            </button>
+        </form>
+
+        <div class="forgot-password">
+            <a href="{% url 'forgot_password' %}">Forgot password?</a>
+        </div>
+
+    </div>
+
+    <div class="auth-card auth-card-secondary">
+        <p>Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + 'Icon');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa-regular fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa-regular fa-eye';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,317 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillSync - Share and discover amazing content">
+    <title>{% block title %}SkillSync{% endblock %}</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    
+    <!-- ================================================================
+         PAGE LOADER
+         ================================================================ -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <span class="loader-text">SkillSync</span>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         APP CONTAINER
+         ================================================================ -->
+    <div class="app-container">
+        
+        <!-- ============================================================
+             SIDEBAR (Desktop Navigation)
+             ============================================================ -->
+        <aside class="sidebar">
+            <!-- Logo -->
+            <div class="sidebar-header">
+                <a href="{% url 'home' %}" class="sidebar-logo">
+                    <span class="logo-text">SkillSync</span>
+                </a>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="sidebar-nav">
+                <a href="{% url 'home' %}" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+                
+                <a href="{% url 'search' %}" class="nav-item {% if request.resolver_match.url_name == 'search' %}active{% endif %}">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Search</span>
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'add_content' %}" class="nav-item {% if request.resolver_match.url_name == 'add_content' %}active{% endif %}">
+                        <i class="fa-solid fa-square-plus"></i>
+                        <span>Create</span>
+                    </a>
+                    
+                    <a href="{% url 'chat_list' %}" class="nav-item {% if request.resolver_match.url_name == 'chat_list' or request.resolver_match.url_name == 'chat_detail' or request.resolver_match.url_name == 'chat_room' %}active{% endif %}">
+                        <i class="fa-solid fa-message"></i>
+                        <span>Messages</span>
+                    </a>
+                    
+                    <a href="{% url 'view_profile' user.username %}" class="nav-item {% if request.resolver_match.url_name == 'view_profile' and request.resolver_match.kwargs.username == user.username %}active{% endif %}">
+                        <div class="nav-avatar">
+                            {% if user.profile and user.profile.profile_picture and user.profile.get_profile_picture_url %}
+                                <img src="{{ user.profile.get_profile_picture_url }}" 
+                                     alt="{{ user.username }}"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="avatar-placeholder" style="display: none;">{{ user.username|first|upper }}</div>
+                            {% else %}
+                                <div class="avatar-placeholder">{{ user.username|first|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <span>Profile</span>
+                    </a>
+                {% endif %}
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                {% if user.is_authenticated %}
+                    <!-- More Menu Trigger -->
+                    <button class="nav-item" id="menuTrigger">
+                        <i class="fa-solid fa-bars"></i>
+                        <span>More</span>
+                    </button>
+                    
+                    <!-- More Menu Dropdown -->
+                    <div class="more-menu" id="moreMenu">
+                        <a href="{% url 'edit_profile' %}" class="more-menu-item">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="{% url 'about' %}" class="more-menu-item">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>About</span>
+                        </a>
+                        <button class="more-menu-item" id="themeToggle">
+                            <i class="fa-solid fa-moon" id="themeIcon"></i>
+                            <span id="themeText">Dark Mode</span>
+                        </button>
+                        <div class="more-menu-divider"></div>
+                        <a href="{% url 'logout' %}" class="more-menu-item logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Log out</span>
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-item">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="{% url 'register' %}" class="nav-item">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- ============================================================
+             MAIN CONTENT AREA
+             ============================================================ -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+    </div>
+
+    <!-- ================================================================
+         BOTTOM NAVIGATION (Mobile Only)
+         ================================================================ -->
+    <nav class="bottom-nav">
+        <a href="{% url 'home' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        
+        <a href="{% url 'search' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'search' %}active{% endif %}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'add_content' %}" class="bottom-nav-item create-btn {% if request.resolver_match.url_name == 'add_content' %}active{% endif %}">
+                <i class="fa-solid fa-plus"></i>
+            </a>
+            
+            <a href="{% url 'chat_list' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'chat_list' %}active{% endif %}">
+                <i class="fa-solid fa-message"></i>
+            </a>
+            
+            <a href="{% url 'view_profile' user.username %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'view_profile' %}active{% endif %}">
+                <div class="bottom-nav-avatar">
+                    {% if user.profile and user.profile.profile_picture and user.profile.get_profile_picture_url %}
+                        <img src="{{ user.profile.get_profile_picture_url }}" 
+                             alt="{{ user.username }}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="avatar-placeholder-small" style="display: none;">{{ user.username|first|upper }}</div>
+                    {% else %}
+                        <div class="avatar-placeholder-small">{{ user.username|first|upper }}</div>
+                    {% endif %}
+                </div>
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="bottom-nav-item">
+                <i class="fa-solid fa-right-to-bracket"></i>
+            </a>
+            <a href="{% url 'register' %}" class="bottom-nav-item">
+                <i class="fa-solid fa-user-plus"></i>
+            </a>
+        {% endif %}
+    </nav>
+
+    <!-- ================================================================
+         TOAST NOTIFICATIONS CONTAINER
+         ================================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ================================================================
+         JAVASCRIPT
+         ================================================================ -->
+    <script>
+        // ==================================================================
+        // Page Loader - Hide after page loads
+        // ==================================================================
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('pageLoader');
+                if (loader) loader.classList.add('hidden');
+            }, 500);
+        });
+
+        // ==================================================================
+        // More Menu Toggle
+        // ==================================================================
+        const menuTrigger = document.getElementById('menuTrigger');
+        const moreMenu = document.getElementById('moreMenu');
+        
+        if (menuTrigger && moreMenu) {
+            menuTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                moreMenu.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!moreMenu.contains(e.target) && !menuTrigger.contains(e.target)) {
+                    moreMenu.classList.remove('show');
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    moreMenu.classList.remove('show');
+                }
+            });
+        }
+
+        // ==================================================================
+        // Dark Mode Toggle
+        // ==================================================================
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        
+        const savedTheme = localStorage.getItem('skillsync-theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
+            if (themeText) themeText.textContent = 'Light Mode';
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                
+                localStorage.setItem('skillsync-theme', isDark ? 'dark' : 'light');
+                
+                if (themeIcon) themeIcon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+                if (themeText) themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+                
+                if (moreMenu) moreMenu.classList.remove('show');
+            });
+        }
+
+        // ==================================================================
+        // CSRF Token Helper
+        // ==================================================================
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach(cookie => {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    }
+                });
+            }
+            return cookieValue;
+        }
+
+        // ==================================================================
+        // Toast Notification Function
+        // ==================================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;font-size:18px;margin-left:8px;">&times;</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ==================================================================
+        // Image Error Handler
+        // ==================================================================
+        function handleImageError(img) {
+            img.style.display = 'none';
+            const fallback = img.nextElementSibling;
+            if (fallback && fallback.classList.contains('avatar-placeholder')) {
+                fallback.style.display = 'flex';
+            }
+        }
+
+        // ==================================================================
+        // Make functions globally available
+        // ==================================================================
+        window.getCookie = getCookie;
+        window.showToast = showToast;
+        window.handleImageError = handleImageError;
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1 @@
+# skillSync Django Project 

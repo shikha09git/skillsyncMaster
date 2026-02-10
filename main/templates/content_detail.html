@@ -1,0 +1,483 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ content.title }} - SkillSync{% endblock %}
+
+{% block content %}
+
+<div class="feed-container">
+    
+    <!-- ================================================================
+         BACK BUTTON
+         ================================================================ -->
+    <div class="mb-3" style="padding: 0 16px;">
+        <a href="{% url 'home' %}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Feed
+        </a>
+    </div>
+
+    <!-- ================================================================
+         POST CARD
+         ================================================================ -->
+    <article class="post-card">
+        
+        <!-- Post Header -->
+        <header class="post-header">
+            <a href="{% url 'view_profile' content.created_by.username %}" class="post-avatar">
+                {% if content.created_by.profile.profile_picture and content.created_by.profile.get_profile_picture_url %}
+                    <img src="{{ content.created_by.profile.get_profile_picture_url }}" 
+                         alt="{{ content.created_by.username }}"
+                         onerror="handleImageError(this)">
+                    <div class="avatar-placeholder" style="display: none;">
+                        {{ content.created_by.username|first|upper }}
+                    </div>
+                {% else %}
+                    <div class="avatar-placeholder">
+                        {{ content.created_by.username|first|upper }}
+                    </div>
+                {% endif %}
+            </a>
+            
+            <div class="post-user-info">
+                <div class="post-username">
+                    <a href="{% url 'view_profile' content.created_by.username %}">
+                        {{ content.created_by.profile.full_name|default:content.created_by.username }}
+                    </a>
+                </div>
+                <div class="post-time">{{ content.created_at|date:"F j, Y" }} • {{ content.created_at|time:"g:i A" }}</div>
+            </div>
+
+            <div class="post-header-right">
+                {% if user.is_authenticated and user != content.created_by %}
+                    {% if is_following %}
+                        <form method="POST" action="{% url 'unfollow' content.created_by.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="follow-btn following">Following</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="{% url 'send_follow_request' content.created_by.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="follow-btn">Follow</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Post Media -->
+        {% if content.image %}
+            <div class="post-media">
+                <img src="{{ content.image.url }}" alt="{{ content.title }}">
+            </div>
+        {% elif content.video %}
+            <div class="post-media">
+                <video controls>
+                    <source src="{{ content.video.url }}" type="video/mp4">
+                </video>
+            </div>
+        {% elif content.pdf %}
+            <div class="post-media">
+                <div class="post-media-placeholder pdf-placeholder">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>PDF Document</span>
+                </div>
+            </div>
+            <a href="{{ content.pdf.url }}" target="_blank" class="pdf-badge">
+                <i class="fa-solid fa-download"></i> Download PDF
+            </a>
+        {% endif %}
+
+        <!-- Post Actions -->
+        <div class="post-actions">
+            <button class="post-action-btn like-btn {% if user in content.likes.all %}liked{% endif %}" 
+                    data-post-id="{{ content.id }}">
+                <i class="{% if user in content.likes.all %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+            </button>
+            <button class="post-action-btn">
+                <i class="fa-regular fa-comment"></i>
+            </button>
+            <button class="post-action-btn share-btn" 
+                    data-url="{{ request.build_absolute_uri }}"
+                    data-title="{{ content.title }}">
+                <i class="fa-regular fa-paper-plane"></i>
+            </button>
+            
+            {% if content.created_by == user %}
+            <form method="POST" action="{% url 'delete_content' content.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="post-action-btn delete-post-btn" 
+                        onclick="return confirm('Delete this post?')">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            </form>
+            {% endif %}
+            
+            <button class="post-action-btn bookmark">
+                <i class="fa-regular fa-bookmark"></i>
+            </button>
+        </div>
+
+        <!-- Post Stats -->
+        <div class="post-stats" id="likes-{{ content.id }}">
+            {{ content.likes.count }} like{{ content.likes.count|pluralize }}
+        </div>
+
+        <!-- Full Content -->
+        <div class="post-caption">
+            <strong>{{ content.created_by.username }}</strong>
+            <span class="title">{{ content.title }}</span>
+            <p class="mt-2" style="color: var(--text-primary); -webkit-line-clamp: unset;">
+                {{ content.description }}
+            </p>
+        </div>
+
+        <!-- Post Meta -->
+        {% if content.instructor or content.duration %}
+        <div class="post-meta">
+            {% if content.instructor %}
+                <span class="post-meta-item">
+                    <i class="fa-solid fa-chalkboard-user"></i> {{ content.instructor }}
+                </span>
+            {% endif %}
+            {% if content.duration %}
+                <span class="post-meta-item">
+                    <i class="fa-solid fa-clock"></i> {{ content.duration }}
+                </span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </article>
+
+    <!-- ================================================================
+         COMMENTS SECTION
+         ================================================================ -->
+    <div class="post-card mt-3">
+        <div class="p-3">
+            <h3 class="font-semibold mb-3">
+                <i class="fa-regular fa-comments"></i> 
+                Comments ({{ content.comment_set.count }})
+            </h3>
+
+            <!-- Add Comment Form -->
+            {% if user.is_authenticated %}
+            <form class="add-comment-form mb-4" data-post-id="{{ content.id }}" style="border: none; padding: 0;">
+                {% csrf_token %}
+                <input type="text" 
+                       name="body" 
+                       class="form-input"
+                       placeholder="Write a comment..." 
+                       autocomplete="off"
+                       maxlength="500"
+                       style="flex: 1;">
+                <button type="submit" class="btn btn-primary" disabled>Post</button>
+            </form>
+            {% else %}
+            <p class="text-muted mb-4">
+                <a href="{% url 'login' %}" class="text-primary">Log in</a> to comment.
+            </p>
+            {% endif %}
+
+            <!-- Comments List -->
+            <div class="comments-list" id="comments-{{ content.id }}">
+                {% for comment in content.comment_set.all %}
+                <div class="comment-item" id="comment-{{ comment.id }}">
+                    <a href="{% url 'view_profile' comment.user.username %}" class="comment-avatar">
+                        {% if comment.user.profile.get_profile_picture_url %}
+                            <img src="{{ comment.user.profile.get_profile_picture_url }}" alt="">
+                        {% else %}
+                            <div class="avatar-placeholder-small">{{ comment.user.username|first|upper }}</div>
+                        {% endif %}
+                    </a>
+                    <div class="comment-content">
+                        <p>
+                            <span class="comment-username">
+                                <a href="{% url 'view_profile' comment.user.username %}">{{ comment.user.username }}</a>
+                            </span>
+                            <span class="comment-text">{{ comment.body }}</span>
+                        </p>
+                        <div class="comment-meta">
+                            <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
+                            {% if comment.user == user %}
+                            <button class="comment-delete delete-comment-btn" 
+                                    data-comment-id="{{ comment.id }}"
+                                    data-post-id="{{ content.id }}">
+                                Delete
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-comments text-center text-muted p-4">
+                    <i class="fa-regular fa-comment-dots" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
+                    No comments yet. Be the first!
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>© 2025 SkillSync</p>
+</footer>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .comment-item {
+        display: flex;
+        gap: 12px;
+    }
+
+    .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .comment-content {
+        flex: 1;
+        background: var(--bg-tertiary);
+        padding: 12px 16px;
+        border-radius: var(--radius-lg);
+    }
+
+    .comment-username {
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .comment-username a {
+        color: var(--text-primary);
+    }
+
+    .comment-username a:hover {
+        text-decoration: underline;
+    }
+
+    .comment-text {
+        color: var(--text-primary);
+        line-height: 1.5;
+    }
+
+    .comment-meta {
+        display: flex;
+        gap: 16px;
+        margin-top: 8px;
+    }
+
+    .comment-time {
+        font-size: 12px;
+        color: var(--text-tertiary);
+    }
+
+    .comment-delete {
+        font-size: 12px;
+        color: var(--text-tertiary);
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .comment-delete:hover {
+        color: var(--danger);
+    }
+
+    .add-comment-form {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .add-comment-form .form-input {
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrftoken = getCookie('csrftoken');
+    const postId = {{ content.id }};
+
+    // ==================================================================
+    // LIKE BUTTON
+    // ==================================================================
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            fetch(`/content/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const icon = this.querySelector('i');
+                if (data.liked) {
+                    this.classList.add('liked');
+                    icon.className = 'fa-solid fa-heart';
+                } else {
+                    this.classList.remove('liked');
+                    icon.className = 'fa-regular fa-heart';
+                }
+                document.getElementById(`likes-${postId}`).textContent = 
+                    `${data.total_likes} like${data.total_likes !== 1 ? 's' : ''}`;
+            });
+        });
+    });
+
+    // ==================================================================
+    // COMMENT FORM
+    // ==================================================================
+    const commentForm = document.querySelector('.add-comment-form');
+    if (commentForm) {
+        const input = commentForm.querySelector('input[name="body"]');
+        const submitBtn = commentForm.querySelector('button[type="submit"]');
+
+        input.addEventListener('input', () => {
+            submitBtn.disabled = !input.value.trim();
+        });
+
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const body = input.value.trim();
+            if (!body) return;
+
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('body', body);
+
+            fetch(`/content/${postId}/comment/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Add new comment to list
+                    const commentsList = document.getElementById(`comments-${postId}`);
+                    const emptyMsg = commentsList.querySelector('.empty-comments');
+                    if (emptyMsg) emptyMsg.remove();
+
+                    const newComment = document.createElement('div');
+                    newComment.className = 'comment-item';
+                    newComment.id = `comment-${data.id}`;
+                    newComment.innerHTML = `
+                        <div class="comment-avatar">
+                            <div class="avatar-placeholder-small">${data.username.charAt(0).toUpperCase()}</div>
+                        </div>
+                        <div class="comment-content">
+                            <p>
+                                <span class="comment-username">${data.username}</span>
+                                <span class="comment-text">${data.body}</span>
+                            </p>
+                            <div class="comment-meta">
+                                <span class="comment-time">Just now</span>
+                                <button class="comment-delete delete-comment-btn" 
+                                        data-comment-id="${data.id}"
+                                        data-post-id="${postId}">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    commentsList.insertBefore(newComment, commentsList.firstChild);
+
+                    input.value = '';
+                    showToast('Comment added!', 'success');
+                }
+            })
+            .catch(() => {
+                showToast('Failed to add comment', 'error');
+            })
+            .finally(() => {
+                submitBtn.disabled = true;
+            });
+        });
+    }
+
+    // ==================================================================
+    // DELETE COMMENT
+    // ==================================================================
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-comment-btn')) {
+            const commentId = e.target.dataset.commentId;
+            
+            if (!confirm('Delete this comment?')) return;
+
+            fetch(`/comment/${commentId}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`comment-${commentId}`).remove();
+                    showToast('Comment deleted', 'success');
+                }
+            })
+            .catch(() => {
+                showToast('Failed to delete comment', 'error');
+            });
+        }
+    });
+
+    // ==================================================================
+    // SHARE BUTTON
+    // ==================================================================
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = this.dataset.url;
+            if (navigator.share) {
+                navigator.share({ title: '{{ content.title }}', url: url });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Link copied!', 'success');
+                });
+            }
+        });
+    });
+
+    // ==================================================================
+    // BOOKMARK
+    // ==================================================================
+    document.querySelectorAll('.bookmark').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            const isBookmarked = icon.classList.contains('fa-solid');
+            icon.className = isBookmarked ? 'fa-regular fa-bookmark' : 'fa-solid fa-bookmark';
+            showToast(isBookmarked ? 'Removed from saved' : 'Saved!', 'success');
+        });
+    });
+});
+</script>
+{% endblock %}

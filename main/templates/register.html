@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - SkillSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sidebar { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .bottom-nav { display: none !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    
+    <div class="auth-card">
+        
+        <h1 class="auth-logo">SkillSync</h1>
+        
+        <p class="text-muted text-center mb-4">Sign up to share and discover amazing content.</p>
+
+        {% if form.errors %}
+        <div class="alert alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <input type="email" 
+                       name="email" 
+                       class="form-input" 
+                       placeholder="Email address" 
+                       value="{{ form.email.value|default:'' }}"
+                       required 
+                       autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+                <input type="text" 
+                       name="username" 
+                       class="form-input" 
+                       placeholder="Username" 
+                       value="{{ form.username.value|default:'' }}"
+                       required 
+                       autocomplete="username"
+                       maxlength="150">
+            </div>
+            
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input type="password" 
+                           id="password1" 
+                           name="password1" 
+                           class="form-input" 
+                           placeholder="Password" 
+                           required
+                           autocomplete="new-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password1')">
+                        <i class="fa-regular fa-eye" id="password1Icon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input type="password" 
+                           id="password2" 
+                           name="password2" 
+                           class="form-input" 
+                           placeholder="Confirm password" 
+                           required
+                           autocomplete="new-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password2')">
+                        <i class="fa-regular fa-eye" id="password2Icon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <p class="text-small text-muted text-center mt-3 mb-3">
+                By signing up, you agree to our <a href="#" class="text-primary">Terms</a> and <a href="#" class="text-primary">Privacy Policy</a>.
+            </p>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                Sign Up
+            </button>
+        </form>
+
+    </div>
+
+    <div class="auth-card auth-card-secondary">
+        <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + 'Icon');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa-regular fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa-regular fa-eye';
+        }
+    }
+
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+
+    function validatePasswords() {
+        if (password2.value && password1.value !== password2.value) {
+            password2.classList.add('error');
+        } else {
+            password2.classList.remove('error');
+        }
+    }
+
+    if (password1 && password2) {
+        password1.addEventListener('input', validatePasswords);
+        password2.addEventListener('input', validatePasswords);
+    }
+</script>
+{% endblock %}

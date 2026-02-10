@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to SkillSync</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header-subtitle {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 20px;
+            color: #333333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .message {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .welcome-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .welcome-box h2 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+        .welcome-box p {
+            margin: 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        .account-details {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 15px;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .detail-value {
+            color: #333333;
+        }
+        .features-section {
+            margin: 30px 0;
+        }
+        .features-title {
+            font-size: 18px;
+            color: #333333;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .feature-item {
+            display: flex;
+            margin-bottom: 15px;
+            font-size: 15px;
+            color: #666666;
+            line-height: 1.6;
+        }
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+        .feature-text {
+            flex: 1;
+        }
+        .feature-text strong {
+            color: #333333;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 25px 0;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover {
+            text-decoration: none;
+        }
+        .tips-section {
+            background-color: #e7f3ff;
+            border-left: 4px solid #0078d4;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .tips-title {
+            color: #0078d4;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .tips-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .tips-list li {
+            color: #0078d4;
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 14px;
+        }
+        .tips-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 30px 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer-text {
+            font-size: 12px;
+            color: #999999;
+            margin: 10px 0;
+        }
+        .support-link {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎉 Welcome to SkillSync!</h1>
+            <p class="header-subtitle">Your journey to skill mastery begins here</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">Hello <strong>{{ first_name }}</strong>,</p>
+            
+            <p class="message">
+                Thank you for joining SkillSync! We're thrilled to have you as part of our growing community of learners and professionals. Your account has been successfully created, and you're now ready to start your learning journey.
+            </p>
+
+            <!-- Welcome Box -->
+            <div class="welcome-box">
+                <h2>🚀 Ready to Get Started?</h2>
+                <p>Explore thousands of courses and connect with mentors today!</p>
+            </div>
+
+            <!-- Account Details -->
+            <div class="account-details">
+                <div class="detail-row">
+                    <span class="detail-label">Username:</span>
+                    <span class="detail-value">{{ username }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ email }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Member Since:</span>
+                    <span class="detail-value">{{ registration_date }}</span>
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+            <center>
+                <a href="{{ dashboard_url }}" class="cta-button">Visit Your Dashboard</a>
+            </center>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <div class="features-title">✨ What You Can Do on SkillSync:</div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-text">
+                        <strong>Connect with Mentors</strong>
+                        Get guidance from experienced professionals and accelerate your learning journey.
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">🤝</div>
+                    <div class="feature-text">
+                        <strong>Join Community</strong>
+                        Collaborate with fellow learners, share projects, and network with professionals.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="tips-section">
+                <div class="tips-title">💡 Quick Tips to Get Started:</div>
+                <ul class="tips-list">
+                    <li>Complete your profile to help us recommend better courses</li>
+                    <li>Explore our featured courses and trending topics</li>
+                    <li>Join relevant communities based on your interests</li>
+                    <li>Set learning goals and track your progress</li>
+                    <li>Connect with mentors in your field of interest</li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <p class="message">
+                If you have any questions or need assistance, our support team is here to help. Feel free to reach out at 
+                <a href="mailto:{{ support_email }}" class="support-link">{{ support_email }}</a>
+            </p>
+
+            <p class="message" style="font-style: italic; color: #999999;">
+                Welcome aboard! We're excited to see what you'll achieve with SkillSync.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">© 2024 SkillSync. All rights reserved.</p>
+            <p class="footer-text">This is an automated message. Please do not reply to this email.</p>
+            <p class="footer-text">
+                <a href="#" class="support-link">Privacy Policy</a> | 
+                <a href="#" class="support-link">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

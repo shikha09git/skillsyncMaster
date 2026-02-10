@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About - SkillSync{% endblock %}
+
+{% block content %}
+<div class="feed-container" style="max-width: 960px;">
+
+  <!-- Hero -->
+  <section class="p-4 mb-4" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+    <p class="text-small text-muted" style="letter-spacing: 1px; text-transform: uppercase;">About</p>
+    <h1 class="mt-2" style="font-size: 28px; font-weight: 800;">SkillSync</h1>
+    <p class="text-muted mt-2" style="line-height: 1.6;">
+      Connect. Learn. Grow together. Share your skills, discover new content, and connect with like‑minded people.
+    </p>
+    <div class="mt-3" style="display: flex; gap: 12px; flex-wrap: wrap;">
+      {% if user.is_authenticated %}
+        <a class="btn btn-primary" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Go to Feed</a>
+        <a class="btn btn-secondary" href="{% url 'add_content' %}"><i class="fa-solid fa-plus"></i> Create Post</a>
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'register' %}"><i class="fa-solid fa-user-plus"></i> Sign Up Free</a>
+        <a class="btn btn-secondary" href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Log In</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="p-4 mb-4" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">What We Offer</h2>
+    <div class="feature-grid">
+      <div class="feature-card"><i class="fa-solid fa-share-nodes"></i> Share content: images, videos, PDFs.</div>
+      <div class="feature-card"><i class="fa-solid fa-users"></i> Connect: follow creators, build network.</div>
+      <div class="feature-card"><i class="fa-solid fa-comments"></i> Chat: real-time collaboration.</div>
+      <div class="feature-card"><i class="fa-solid fa-graduation-cap"></i> Learn: tutorials and resources.</div>
+      <div class="feature-card"><i class="fa-solid fa-heart"></i> Engage: like, comment, save.</div>
+      <div class="feature-card"><i class="fa-solid fa-moon"></i> Dark mode: easy on the eyes.</div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="p-4 mb-4" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">Community at a glance</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">{{ total_users|default:"counting.." }}</div>
+        <div class="stat-label">Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ total_posts|default:"counting.." }}</div>
+        <div class="stat-label">Posts Shared</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ total_connections|default:"counting.." }}</div>
+        <div class="stat-label">Connections</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="p-4 mb-4" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center;">
+    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Ready to start?</h2>
+    <p class="text-muted mb-3">Join SkillSync and grow with the community.</p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      {% if user.is_authenticated %}
+        <a class="btn btn-primary" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Go to Feed</a>
+        <a class="btn btn-secondary" href="{% url 'add_content' %}"><i class="fa-solid fa-plus"></i> Create Post</a>
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'register' %}"><i class="fa-solid fa-user-plus"></i> Sign Up Free</a>
+        <a class="btn btn-secondary" href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Log In</a>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+    <a href="#">Help</a>
+  </div>
+  <p>© 2025 SkillSync. All rights reserved.</p>
+</footer>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Minimal helpers; uses existing theme vars */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.feature-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  font-weight: 600;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.feature-card i { color: var(--accent-primary); }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.stat-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+}
+.stat-number {
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #405DE6, #833AB4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.stat-label { color: var(--text-secondary); margin-top: 4px; }
+@media (max-width: 600px) {
+  .about-hero { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}

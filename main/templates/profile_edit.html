@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - SkillSync{% endblock %}
+
+{% block content %}
+
+<div class="feed-container">
+    <div class="feed-header">
+        <h1 class="feed-title">⚙️ Edit Profile</h1>
+        <p class="feed-subtitle">Update your personal information</p>
+    </div>
+
+    <div class="post-card p-4">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} mb-3">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" id="editProfileForm">
+            {% csrf_token %}
+
+            <!-- Avatar -->
+            <div class="profile-picture-section">
+                <div class="current-avatar">
+                    {% if user.profile and user.profile.profile_picture and user.profile.get_profile_picture_url %}
+                        <img src="{{ user.profile.get_profile_picture_url }}" alt="{{ user.username }}" id="avatarPreview" onerror="handleImageError(this)">
+                        <div class="avatar-placeholder-large" id="avatarFallback" style="display:none;">{{ user.username|first|upper }}</div>
+                    {% else %}
+                        <div class="avatar-placeholder-large" id="avatarFallback">{{ user.username|first|upper }}</div>
+                    {% endif %}
+                </div>
+                <div class="avatar-actions">
+                    <h3>{{ user.username }}</h3>
+                    <input type="file" name="profile_picture" id="profilePictureInput" accept="image/*" hidden>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('profilePictureInput').click()">
+                        <i class="fa-solid fa-camera"></i> Change Photo
+                    </button>
+                    {% if user.profile and user.profile.profile_picture %}
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="removeProfilePicture()">
+                        <i class="fa-solid fa-trash"></i> Remove
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Full Name -->
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="full_name" class="form-input" placeholder="Your full name"
+                       value="{{ user.profile.full_name|default:'' }}" maxlength="100">
+                <small class="text-muted">Use the name you're known by.</small>
+            </div>
+
+            <!-- Username (read-only) -->
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" value="{{ user.username }}" disabled readonly>
+                <small class="text-muted">Username cannot be changed.</small>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-input" placeholder="you@example.com"
+                       value="{{ user.email|default:'' }}" required>
+            </div>
+
+            <!-- Profession -->
+            <div class="form-group">
+                <label class="form-label">Profession</label>
+                <input type="text" name="profession" class="form-input"
+                       placeholder="e.g., Developer, Designer, Student"
+                       value="{{ user.profile.profession|default:'' }}" maxlength="100">
+            </div>
+
+            <!-- Bio -->
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                <textarea name="about" class="form-input" rows="4" maxlength="500"
+                          placeholder="Tell us about yourself...">{{ user.profile.about|default:'' }}</textarea>
+                <small class="text-muted"><span id="bioCharCount">{{ user.profile.about|length|default:0 }}</span>/500</small>
+            </div>
+
+            <hr class="divider">
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-check"></i> Save Changes
+                </button>
+                <a href="{% url 'view_profile' user.username %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Change Password -->
+    <div class="post-card p-4 mt-4">
+        <h3 class="font-semibold mb-3"><i class="fa-solid fa-lock"></i> Change Password</h3>
+        <form method="POST" action="{% url 'change_password' %}" id="changePasswordForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="currentPassword" name="current_password" class="form-input" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('currentPassword')">
+                        <i class="fa-regular fa-eye" id="currentPasswordIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="newPassword" name="new_password" class="form-input" required minlength="8">
+                    <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                        <i class="fa-regular fa-eye" id="newPasswordIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirmPassword" name="confirm_password" class="form-input" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                        <i class="fa-regular fa-eye" id="confirmPasswordIcon"></i>
+                    </button>
+                </div>
+                <small class="text-danger" id="passwordMatchError" style="display:none;">Passwords do not match</small>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-key"></i> Update Password
+            </button>
+        </form>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="post-card p-4 mt-4 danger-zone">
+        <h3 class="font-semibold mb-3 text-danger"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h3>
+        <p class="text-muted mb-3">Deleting your account is irreversible.</p>
+        <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
+            <i class="fa-solid fa-trash"></i> Delete Account
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-picture-section{display:flex;align-items:center;gap:24px;margin-bottom:24px;}
+.current-avatar{width:100px;height:100px;border-radius:50%;overflow:hidden;border:3px solid var(--border-color);}
+.current-avatar img{width:100%;height:100%;object-fit:cover;}
+.avatar-actions{display:flex;flex-direction:column;gap:8px;}
+.divider{border:none;border-top:1px solid var(--border-color);margin:24px 0;}
+.form-actions{display:flex;gap:12px;}
+.danger-zone{border-color:var(--danger);background:rgba(239,68,68,0.05);}
+body.dark-mode .danger-zone{background:rgba(239,68,68,0.1);}
+@media(max-width:480px){.profile-picture-section{flex-direction:column;text-align:center}.avatar-actions{align-items:center}.form-actions{flex-direction:column}.form-actions .btn{width:100%;}}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  const profilePictureInput=document.getElementById('profilePictureInput');
+  const avatarPreview=document.getElementById('avatarPreview');
+  const avatarFallback=document.getElementById('avatarFallback');
+  if(profilePictureInput){
+    profilePictureInput.addEventListener('change',function(){
+      const file=this.files[0];
+      if(file){
+        if(file.size>5*1024*1024){showToast('Image must be less than 5MB','error');this.value='';return;}
+        const reader=new FileReader();
+        reader.onload=e=>{
+          if(avatarPreview){avatarPreview.src=e.target.result;avatarPreview.style.display='block';}
+          if(avatarFallback){avatarFallback.style.display='none';}
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  const bioTextarea=document.querySelector('textarea[name="about"]');
+  const bioCharCount=document.getElementById('bioCharCount');
+  if(bioTextarea && bioCharCount){
+    bioTextarea.addEventListener('input',()=>{bioCharCount.textContent=bioTextarea.value.length;});
+  }
+  const newPassword=document.getElementById('newPassword');
+  const confirmPassword=document.getElementById('confirmPassword');
+  const passwordMatchError=document.getElementById('passwordMatchError');
+  function validatePasswords(){
+    if(!confirmPassword.value){passwordMatchError.style.display='none';confirmPassword.classList.remove('error');return;}
+    if(newPassword.value!==confirmPassword.value){
+      passwordMatchError.style.display='block';confirmPassword.classList.add('error');
+    }else{passwordMatchError.style.display='none';confirmPassword.classList.remove('error');}
+  }
+  if(newPassword && confirmPassword){
+    newPassword.addEventListener('input',validatePasswords);
+    confirmPassword.addEventListener('input',validatePasswords);
+    document.getElementById('changePasswordForm').addEventListener('submit',function(e){
+      if(newPassword.value!==confirmPassword.value){e.preventDefault();showToast('Passwords do not match','error');}
+    });
+  }
+});
+function togglePassword(id){
+  const input=document.getElementById(id);
+  const icon=document.getElementById(id+'Icon');
+  if(!input||!icon)return;
+  if(input.type==='password'){input.type='text';icon.className='fa-regular fa-eye-slash';}
+  else{input.type='password';icon.className='fa-regular fa-eye';}
+}
+function removeProfilePicture(){
+  if(confirm('Remove your profile picture?')){
+    const form=document.getElementById('editProfileForm');
+    const input=document.createElement('input');
+    input.type='hidden';input.name='remove_picture';input.value='1';
+    form.appendChild(input);form.submit();
+  }
+}
+function confirmDeleteAccount(){
+  if(confirm('Are you sure you want to delete your account? This cannot be undone!')){
+    const confirmText=prompt('Type "DELETE" to confirm:');
+    if(confirmText==='DELETE'){window.location.href="{% url 'delete_account' %}";}
+    else{showToast('Account deletion cancelled','info');}
+  }
+}
+</script>
+{% endblock %}
